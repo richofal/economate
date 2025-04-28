@@ -1,0 +1,11 @@
+{
+    "framework": "vite",
+    "buildCommand": "npm run build",
+    "outputDirectory": "public",
+    "rewrites": [{ "source": "/(.*)", "destination": "/index.php" }],
+    "functions": {
+        "api/*.php": {
+            "runtime": "vercel-php@0.6.0"
+        }
+    }
+}
