@@ -221,15 +221,7 @@ const Header = ({
                         >
                             <div className="relative">
                                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 overflow-hidden">
-                                    {auth.user?.profile_photo ? (
-                                        <img
-                                            src={auth.user.profile_photo}
-                                            alt={auth.user.name}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <User size={16} />
-                                    )}
+                                    <User size={16} />
                                 </div>
                                 <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 border-2 border-white rounded-full"></span>
                             </div>
