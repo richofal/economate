@@ -15,8 +15,7 @@ import {
     CardTitle,
 } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/Components/ui/separator";
+import { Label } from "@/Components/ui/label";
 import { ChevronLeft, Info, Package, UserCheck } from "lucide-react";
 import {
     Select,

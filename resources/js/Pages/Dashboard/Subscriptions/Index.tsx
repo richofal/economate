@@ -1,31 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Head, Link, usePage } from "@inertiajs/react";
 import {
     FileText,
     Search,
     X,
-    ChevronLeft,
-    ChevronRight,
     Clock,
     CheckCircle,
     XCircle,
-    AlertCircle,
     MoreHorizontal,
     Plus,
-    User,
-    Shield,
-    Package,
-    Calendar,
     CalendarClock,
-    BarChart,
     RefreshCw,
-    Filter,
     DollarSign,
     Edit,
-    Trash,
     Eye,
     ArrowUpDown,
-    CalendarDays,
 } from "lucide-react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Subscription, PageProps } from "@/types";
@@ -71,7 +60,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/Components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import {
     Select,
     SelectContent,

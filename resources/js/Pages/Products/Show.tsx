@@ -51,7 +51,7 @@ import {
 } from "@/Components/ui/dialog";
 import { Input } from "@/Components/ui/input";
 import { useForm } from "@inertiajs/react";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/Components/ui/label";
 
 interface ProductShowProps extends PageProps {
     product: Product;

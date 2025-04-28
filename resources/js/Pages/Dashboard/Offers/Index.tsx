@@ -62,10 +62,10 @@ const OffersIndex = () => {
             offer.offer_number
                 ?.toLowerCase()
                 .includes(searchTerm.toLowerCase()) ||
-            offer.user?.name
+            offer.lead?.name
                 ?.toLowerCase()
                 .includes(searchTerm.toLowerCase()) ||
-            offer.user?.email
+            offer.lead?.email
                 ?.toLowerCase()
                 .includes(searchTerm.toLowerCase()) ||
             offer.product_price?.product?.name
@@ -338,17 +338,17 @@ const OffersIndex = () => {
                                                     {offer.offer_number}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {offer.user ? (
+                                                    {offer.lead ? (
                                                         <div className="flex flex-col">
                                                             <span>
                                                                 {
-                                                                    offer.user
+                                                                    offer.lead
                                                                         .name
                                                                 }
                                                             </span>
                                                             <span className="text-xs text-muted-foreground">
                                                                 {
-                                                                    offer.user
+                                                                    offer.lead
                                                                         .email
                                                                 }
                                                             </span>

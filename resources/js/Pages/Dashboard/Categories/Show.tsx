@@ -321,8 +321,9 @@ export default function CategoriesShow() {
                                                             <span className="font-medium">
                                                                 {product.name}
                                                             </span>
-                                                            {product.prices &&
-                                                                product.prices
+                                                            {product.product_prices &&
+                                                                product
+                                                                    .product_prices
                                                                     .length >
                                                                     0 && (
                                                                     <span className="text-sm text-muted-foreground">
@@ -339,7 +340,7 @@ export default function CategoriesShow() {
                                                                             // Use the first price if currentPrice is not available
 
                                                                             product
-                                                                                .prices[0]
+                                                                                .product_prices[0]
                                                                                 .price
                                                                         )}
                                                                     </span>
@@ -376,8 +377,9 @@ export default function CategoriesShow() {
                                                                 Price History
                                                             </h4>
 
-                                                            {!product.prices ||
-                                                            product.prices
+                                                            {!product.product_prices ||
+                                                            product
+                                                                .product_prices
                                                                 .length ===
                                                                 0 ? (
                                                                 <p className="text-sm text-muted-foreground italic">
@@ -406,7 +408,7 @@ export default function CategoriesShow() {
                                                                             </TableRow>
                                                                         </TableHeader>
                                                                         <TableBody>
-                                                                            {product.prices.map(
+                                                                            {product.product_prices.map(
                                                                                 (
                                                                                     price
                                                                                 ) => (

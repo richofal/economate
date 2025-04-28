@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Head, Link, usePage } from "@inertiajs/react";
 import { Search, X, Eye, ChevronDown, UserRound, Filter } from "lucide-react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Lead, LeadCollection, PageProps } from "@/types";
+import { Lead, PageProps } from "@/types";
 
 import {
     Table,
