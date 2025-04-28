@@ -1835,7 +1835,8 @@ const ProductShow = () => {
                                                         onChange={(e) =>
                                                             setData(
                                                                 "auto_renew",
-                                                                e.target.checked
+                                                                e.target
+                                                                    .checked as false
                                                             )
                                                         }
                                                         className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"

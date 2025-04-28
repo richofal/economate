@@ -182,7 +182,7 @@ export interface Sales {
     created_at?: string;
     updated_at?: string;
     deleted_at?: string | null;
-    createdOffers: Offer[];
+    created_offers: Offer[];
 }
 
 export interface ProductCollection {

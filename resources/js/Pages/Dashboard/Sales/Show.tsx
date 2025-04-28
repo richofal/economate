@@ -694,7 +694,7 @@ const SalesShow = () => {
                                                                     </Link>
                                                                 </TableCell>
                                                                 <TableCell>
-                                                                    {offer.user
+                                                                    {offer.lead
                                                                         ?.name ||
                                                                         "Unknown"}
                                                                 </TableCell>
