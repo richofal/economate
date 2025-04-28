@@ -1,17 +1,31 @@
 {
-    "framework": "vite",
-    "buildCommand": "npm run build",
-    "outputDirectory": "public",
-    "rewrites": [{ "source": "/(.*)", "destination": "/index.php" }],
+    "version": 2,
+    "framework": null,
     "functions": {
         "api/*.php": {
             "runtime": "vercel-php@0.6.0"
         }
     },
-    "routes": [{ "src": "/(.*)", "dest": "/api/index.php" }],
-    "build": {
-        "env": {
-            "NOW_PHP_DEBUG": "1"
-        }
+    "routes": [
+        {
+            "src": "/(css|js|build|images|favicon.ico)/(.*)",
+            "dest": "public/$1/$2"
+        },
+        { "src": "/(.*)", "dest": "/api/index.php" }
+    ],
+    "env": {
+        "APP_NAME": "Bimo CRM",
+        "APP_ENV": "production",
+        "APP_DEBUG": "false",
+        "APP_CONFIG_CACHE": "/tmp/config.php",
+        "APP_EVENTS_CACHE": "/tmp/events.php",
+        "APP_PACKAGES_CACHE": "/tmp/packages.php",
+        "APP_ROUTES_CACHE": "/tmp/routes.php",
+        "APP_SERVICES_CACHE": "/tmp/services.php",
+        "VIEW_COMPILED_PATH": "/tmp/views",
+        "CACHE_DRIVER": "array",
+        "LOG_CHANNEL": "stderr",
+        "SESSION_DRIVER": "cookie",
+        "SSR_TEMP_PATH": "/tmp/ssr"
     }
 }
