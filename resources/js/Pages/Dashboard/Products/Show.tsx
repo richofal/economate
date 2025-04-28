@@ -60,7 +60,6 @@ import {
 } from "@/Components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { Alert, AlertDescription } from "@/Components/ui/alert";
-import { toast } from "@/Hooks/use-toast";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -105,23 +104,6 @@ const ProductsShow = () => {
     const [priceToDelete, setPriceToDelete] = useState<number | null>(null);
     const [activeTab, setActiveTab] = useState("details");
     const [showShareOptions, setShowShareOptions] = useState(false);
-
-    React.useEffect(() => {
-        if (success) {
-            toast({
-                title: "Success",
-                description: success,
-                variant: "default",
-            });
-        }
-        if (error) {
-            toast({
-                title: "Error",
-                description: error,
-                variant: "destructive",
-            });
-        }
-    }, [success, error]);
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat("id-ID", {
@@ -206,11 +188,6 @@ const ProductsShow = () => {
         router.delete(route("products.destroy", { product: product.id }), {
             onSuccess: () => {
                 setIsDeleteDialogOpen(false);
-                toast({
-                    title: "Product Deleted",
-                    description: `${product.name} has been successfully deleted.`,
-                    variant: "default",
-                });
             },
         });
     };
@@ -227,12 +204,6 @@ const ProductsShow = () => {
                     onSuccess: () => {
                         setIsDeletePriceDialogOpen(false);
                         setPriceToDelete(null);
-                        toast({
-                            title: "Price Plan Deleted",
-                            description:
-                                "The pricing plan has been successfully deleted.",
-                            variant: "default",
-                        });
                     },
                 }
             );
@@ -242,22 +213,11 @@ const ProductsShow = () => {
     // Copy product link to clipboard
     const copyProductLink = () => {
         const url = window.location.href;
-        navigator.clipboard.writeText(url).then(() => {
-            toast({
-                title: "Link Copied",
-                description: "Product link copied to clipboard",
-                variant: "default",
-            });
-        });
+        navigator.clipboard.writeText(url).then(() => {});
     };
 
     // Generate PDF specification sheet
     const generatePDF = () => {
-        toast({
-            title: "Generating PDF",
-            description: "Your product specification sheet is being generated",
-            variant: "default",
-        });
         // Implement actual PDF generation here
     };
 
