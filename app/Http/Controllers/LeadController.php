@@ -48,9 +48,11 @@ class LeadController extends Controller
         /** @var \App\Models\User $authUser */
         $authUser = Auth::user();
 
+        $offers = $user->offers()->with(['productPrice.product', 'createdBy'])->get();
+
         return Inertia::render('Dashboard/Leads/Show', [
             'lead' => $user,
-            'offers' => $user->offers,
+            'offers' => $offers,
             'canCreateOffers' => $authUser->can('create-offers'),
         ]);
     }

@@ -67,12 +67,12 @@ import {
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Category, CategoryCollection, PageProps } from "@/types";
+import { Category, PageProps } from "@/types";
 import { FlashMessage } from "@/Components/ui/flash-message";
 
 // Define the props for the CategoriesIndex component
 interface CategoriesIndexProps extends PageProps {
-    categories: CategoryCollection;
+    categories: Category[];
     canCreateCategory: boolean;
     canEditCategory: boolean;
     canDeleteCategory: boolean;
@@ -109,9 +109,8 @@ export default function CategoriesIndex() {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortField, setSortField] = useState<string>("created_at");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-    const [filteredCategories, setFilteredCategories] = useState<Category[]>(
-        categories.data
-    );
+    const [filteredCategories, setFilteredCategories] =
+        useState<Category[]>(categories);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState<number | null>(
         null
@@ -119,8 +118,11 @@ export default function CategoriesIndex() {
     const [isLoading, setIsLoading] = useState(false);
 
     // Stats calculations
-    const totalCategories = categories.meta.total_count;
-    const totalProducts = categories.meta.products_count;
+    const totalCategories = categories.length;
+    const totalProducts = categories.reduce(
+        (acc, category) => acc + (category.products?.length || 0),
+        0
+    );
     const averageProductsPerCategory =
         totalCategories > 0 ? Math.round(totalProducts / totalCategories) : 0;
 
@@ -130,7 +132,7 @@ export default function CategoriesIndex() {
 
         // Simulate loading delay for better UX
         const timer = setTimeout(() => {
-            let result = [...categories.data];
+            let result = [...categories];
 
             // Apply search
             if (searchTerm) {
@@ -172,7 +174,7 @@ export default function CategoriesIndex() {
         }, 300); // Small delay for better UX
 
         return () => clearTimeout(timer);
-    }, [categories.data, searchTerm, sortField, sortDirection]);
+    }, [categories, searchTerm, sortField, sortDirection]);
 
     // Handle sort change
     const handleSort = (field: string) => {
@@ -340,9 +342,9 @@ export default function CategoriesIndex() {
                                 {totalCategories}
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                {categories.data.length > 0
+                                {categories.length > 0
                                     ? `Last added on ${new Date(
-                                          categories.data[0].created_at || ""
+                                          categories[0].created_at || ""
                                       ).toLocaleDateString()}`
                                     : "No categories yet"}
                             </p>

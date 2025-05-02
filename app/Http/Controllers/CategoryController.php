@@ -25,10 +25,10 @@ class CategoryController extends Controller
         $this->authorize('view-categories');
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $categories = Category::latest()->get();
+        $categories = Category::all();
 
         return Inertia::render('Dashboard/Categories/Index', [
-            'categories' => new CategoryCollection($categories),
+            'categories' => $categories,
             'canCreateCategory' => $user->can('create-categories'),
             'canEditCategory' => $user->can('edit-categories'),
             'canDeleteCategory' => $user->can('delete-categories'),

@@ -77,16 +77,11 @@ import {
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import {
-    ProductCollection,
-    CategoryCollection,
-    Product,
-    PageProps,
-} from "@/types";
+import { Product, PageProps, Category } from "@/types";
 
 interface ProductsPageProps extends PageProps {
-    products: ProductCollection;
-    categories: CategoryCollection;
+    products: Product[];
+    categories: Category[];
     canCreateProduct: boolean;
     canEditProduct: boolean;
     canDeleteProduct: boolean;
@@ -101,20 +96,21 @@ export default function ProductsIndex() {
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const [sortField, setSortField] = useState<string>("created_at");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>(
-        products.data
-    );
+    const [filteredProducts, setFilteredProducts] =
+        useState<Product[]>(products);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     // Stats calculations
-    const totalProducts = products.meta.total_count;
-    const activeProducts = products.meta.active_count;
-    const featuredProducts = products.data.filter(
+    const totalProducts = products.length;
+    const activeProducts = products.filter(
+        (product) => product.is_active
+    ).length;
+    const featuredProducts = products.filter(
         (product) => product.is_featured
     ).length;
-    const recurringProducts = products.data.filter(
+    const recurringProducts = products.filter(
         (product) => product.is_recurring
     ).length;
 
@@ -124,7 +120,7 @@ export default function ProductsIndex() {
 
         // Simulate loading delay for better UX
         const timer = setTimeout(() => {
-            let result = [...products.data];
+            let result = [...products];
 
             // Apply search
             if (searchTerm) {
@@ -191,7 +187,7 @@ export default function ProductsIndex() {
 
         return () => clearTimeout(timer);
     }, [
-        products.data,
+        products,
         searchTerm,
         categoryFilter,
         statusFilter,
@@ -315,9 +311,9 @@ export default function ProductsIndex() {
                                 {totalProducts}
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                {products.data.length > 0
+                                {products.length > 0
                                     ? `Last added on ${new Date(
-                                          products.data[0].created_at
+                                          products[0].created_at
                                       ).toLocaleDateString()}`
                                     : "No products yet"}
                             </p>
@@ -400,7 +396,6 @@ export default function ProductsIndex() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </form>
-
                     <div className="flex flex-wrap gap-2">
                         <Select
                             value={categoryFilter}
@@ -413,11 +408,17 @@ export default function ProductsIndex() {
                                 <SelectItem value="all">
                                     All Categories
                                 </SelectItem>
-                                {products.meta.categories.map((category) => (
-                                    <SelectItem key={category} value={category}>
-                                        {category}
-                                    </SelectItem>
-                                ))}
+                                {/* Mengakses categories dari props, bukan dari products */}
+                                {usePage<ProductsPageProps>().props.categories.map(
+                                    (category) => (
+                                        <SelectItem
+                                            key={category.id}
+                                            value={category.name}
+                                        >
+                                            {category.name}
+                                        </SelectItem>
+                                    )
+                                )}
                             </SelectContent>
                         </Select>
 
@@ -445,7 +446,7 @@ export default function ProductsIndex() {
                                 setStatusFilter("all");
                                 setSortField("created_at");
                                 setSortDirection("desc");
-                                route("products.index");
+                                router.visit(route("products.index"));
                             }}
                         >
                             <RefreshCw className="mr-2 h-4 w-4" />

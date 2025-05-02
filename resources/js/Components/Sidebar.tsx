@@ -379,9 +379,9 @@ const Sidebar: React.FC<SidebarProps> = ({ expanded, toggleSidebar }) => {
                                     <SidebarItem
                                         icon={<Users size={20} />}
                                         title="Users"
-                                        href={route("users.index")}
+                                        href={route("sales.index")}
                                         isActive={
-                                            route().current("users.index") ||
+                                            route().current("sales.index") ||
                                             route().current("sales.index") ||
                                             route().current("managers.index") ||
                                             route().current("leads.index") ||

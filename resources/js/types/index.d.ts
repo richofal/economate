@@ -8,7 +8,6 @@ export interface User {
     // Basic user attributes
     address?: string;
     phone?: string;
-    company_name?: string;
     // Timestamps~
     email_verified_at?: string;
     created_at?: string;
@@ -62,6 +61,8 @@ export interface Category {
     slug: string;
     created_at?: string;
     updated_at?: string;
+    deleted_at?: string | null;
+    products: Product[];
 }
 
 export interface Customer {
@@ -183,23 +184,6 @@ export interface Sales {
     updated_at?: string;
     deleted_at?: string | null;
     created_offers: Offer[];
-}
-
-export interface ProductCollection {
-    data: Product[];
-    meta: {
-        total_count: number;
-        active_count: number;
-        categories: string[];
-    };
-}
-
-export interface CategoryCollection {
-    data: Category[];
-    meta: {
-        total_count: number;
-        products_count: number;
-    };
 }
 
 export type PageProps<

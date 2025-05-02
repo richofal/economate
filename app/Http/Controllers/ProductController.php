@@ -30,7 +30,6 @@ class ProductController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Load products based on user role
         $categories = Category::all();
 
         if ($user->hasRole('admin')) {
@@ -54,8 +53,8 @@ class ProductController extends Controller
 
         // Return Inertia view with product collection resource
         return Inertia('Dashboard/Products/Index', [
-            'categories' => new CategoryCollection($categories),
-            'products' => new ProductCollection($products),
+            'categories' => $categories,
+            'products' => $products,
             'canCreateProduct' => $user->can('create-products'),
             'canEditProduct' => $user->can('edit-products'),
             'canDeleteProduct' => $user->can('delete-products'),
@@ -71,7 +70,7 @@ class ProductController extends Controller
         $this->authorize('create-products');
         $categories = Category::all();
         return Inertia('Dashboard/Products/Create', [
-            'categories' => new CategoryCollection($categories),
+            'categories' => $categories,
             'canCreateProduct' => true,
         ]);
     }
@@ -144,7 +143,7 @@ class ProductController extends Controller
         $categories = Category::all();
         return Inertia('Dashboard/Products/Edit', [
             'product' => $product,
-            'categories' => new CategoryCollection($categories),
+            'categories' => $categories,
             'canEditProduct' => true,
         ]);
     }
