@@ -4,8 +4,6 @@ export interface User {
     id: number;
     name: string;
     email: string;
-
-    // Basic user attributes
     address?: string;
     phone?: string;
     // Timestamps~

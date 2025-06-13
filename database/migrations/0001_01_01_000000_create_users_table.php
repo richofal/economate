@@ -19,6 +19,10 @@ return new class extends Migration
             $table->string('password');
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
+            $table->string('image')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('gender', ['male', 'famale'])->default('male');
+            $table->date('birth_date')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
