@@ -1,9 +1,7 @@
-"use client";
-
 import { useState, type FormEventHandler } from "react";
 import {
-    Eye,
-    EyeOff,
+    Eye as RiEyeLine,
+    EyeOff as RiEyeOffLine,
     UserPlus,
     Mail,
     Lock,
@@ -14,11 +12,8 @@ import {
     Check,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import InputError from "@/Components/InputError";
-import InputLabel from "@/Components/InputLabel";
-import TextInput from "@/Components/TextInput";
+import { Head, Link, useForm } from "@inertiajs/react";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { Head, Link, useForm, usePage } from "@inertiajs/react";
 
 const Register = () => {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -27,10 +22,12 @@ const Register = () => {
         password: "",
         password_confirmation: "",
     });
+
     // UI state
     const [showPassword, setShowPassword] = useState(false);
     const [showPasswordConfirmation, setShowPasswordConfirmation] =
         useState(false);
+    const [registerSuccess, setRegisterSuccess] = useState(false);
 
     // Password strength indicator
     const getPasswordStrength = (password: string) => {
@@ -50,530 +47,562 @@ const Register = () => {
 
         post(route("register"), {
             onFinish: () => reset("password", "password_confirmation"),
+            onSuccess: () => setRegisterSuccess(true),
         });
     };
 
     return (
-        <GuestLayout>
+        <GuestLayout
+            showNavbar={true}
+            showFooter={true}
+            pageTitle="Register"
+            withScrollIndicator={false}
+        >
             <Head title="Register" />
 
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-6 px-4 sm:py-12">
-                <div className="w-full max-w-md">
-                    <motion.div
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                    >
-                        <div className="bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden py-4">
-                            {/* Form with Header inside */}
-                            <form onSubmit={submit} className="space-y-6">
-                                {/* Header now inside the form */}
-                                <motion.div
-                                    initial={{ y: -20, opacity: 0 }}
-                                    animate={{ y: 0, opacity: 1 }}
-                                    transition={{ duration: 0.5 }}
-                                    className="text-center pt-8 px-6 sm:px-8"
+            <div className="bg-gradient-to-br from-blue-50 to-[#e6f3ff] flex items-center justify-center min-h-screen w-full py-10">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="bg-white rounded-2xl shadow-xl flex w-11/12 max-w-5xl overflow-hidden"
+                >
+                    {/* Form Section */}
+                    <div className="p-8 lg:p-12 w-full md:w-7/12 lg:w-1/2 flex flex-col justify-center">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="mb-8 text-center md:text-left"
+                        >
+                            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                                Daftar Akun
+                            </h2>
+                            <p className="text-gray-500">
+                                Buat akun untuk mulai mengelola keuangan Anda
+                            </p>
+                        </motion.div>
+
+                        {registerSuccess && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mb-4 p-4 rounded-lg bg-green-100 text-green-700 text-sm flex items-start"
+                            >
+                                <Check
+                                    size={18}
+                                    className="mr-2 mt-0.5 flex-shrink-0"
+                                />
+                                <span>
+                                    Registrasi berhasil! Silahkan cek email Anda
+                                    untuk verifikasi atau
+                                    <Link
+                                        href={route("login")}
+                                        className="ml-1 text-green-800 font-medium hover:underline"
+                                    >
+                                        login sekarang
+                                    </Link>
+                                </span>
+                            </motion.div>
+                        )}
+
+                        <form onSubmit={submit} className="space-y-5">
+                            {/* Name Input */}
+                            <div>
+                                <label
+                                    className="block text-gray-700 mb-1 text-sm font-medium"
+                                    htmlFor="name"
                                 >
-                                    <div className="space-y-2">
-                                        <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800">
-                                            PT SMART
-                                        </h1>
+                                    Nama Lengkap
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <User
+                                            size={18}
+                                            className="text-gray-400"
+                                        />
                                     </div>
+                                    <input
+                                        id="name"
+                                        className={`w-full pl-10 pr-4 py-3 border ${
+                                            errors.name
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/60`}
+                                        placeholder="Masukkan nama lengkap"
+                                        type="text"
+                                        name="name"
+                                        value={data.name}
+                                        onChange={(e) =>
+                                            setData("name", e.target.value)
+                                        }
+                                        disabled={processing}
+                                    />
+                                </div>
+                                <AnimatePresence>
+                                    {errors.name && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -5 }}
+                                            className="flex items-center text-red-500 text-xs mt-1"
+                                        >
+                                            <AlertCircle
+                                                size={14}
+                                                className="mr-1"
+                                            />
+                                            <span>{errors.name}</span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
-                                    <div className="mt-4 sm:mt-6 max-w-md mx-auto">
-                                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-                                            Create Your Account
-                                        </h2>
+                            {/* Email Input */}
+                            <div>
+                                <label
+                                    className="block text-gray-700 mb-1 text-sm font-medium"
+                                    htmlFor="email"
+                                >
+                                    Email
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Mail
+                                            size={18}
+                                            className="text-gray-400"
+                                        />
+                                    </div>
+                                    <input
+                                        id="email"
+                                        className={`w-full pl-10 pr-4 py-3 border ${
+                                            errors.email
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/60`}
+                                        placeholder="contoh@email.com"
+                                        type="email"
+                                        name="email"
+                                        value={data.email}
+                                        onChange={(e) =>
+                                            setData("email", e.target.value)
+                                        }
+                                        disabled={processing}
+                                    />
+                                </div>
+                                <AnimatePresence>
+                                    {errors.email && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -5 }}
+                                            className="flex items-center text-red-500 text-xs mt-1"
+                                        >
+                                            <AlertCircle
+                                                size={14}
+                                                className="mr-1"
+                                            />
+                                            <span>{errors.email}</span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
-                                        <div className="bg-blue-50 rounded-lg p-2 sm:p-3 mt-3 border border-blue-100">
-                                            <p className="text-xs sm:text-sm text-blue-700">
-                                                Join over 10,000 businesses
-                                                managing their customer
-                                                relationships with our platform
-                                            </p>
+                            {/* Password Input */}
+                            <div>
+                                <label
+                                    className="block text-gray-700 mb-1 text-sm font-medium"
+                                    htmlFor="password"
+                                >
+                                    Password
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Lock
+                                            size={18}
+                                            className="text-gray-400"
+                                        />
+                                    </div>
+                                    <input
+                                        id="password"
+                                        className={`w-full pl-10 pr-12 py-3 border ${
+                                            errors.password
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/60`}
+                                        placeholder="Minimal 8 karakter"
+                                        type={
+                                            showPassword ? "text" : "password"
+                                        }
+                                        name="password"
+                                        value={data.password}
+                                        onChange={(e) =>
+                                            setData("password", e.target.value)
+                                        }
+                                        disabled={processing}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowPassword(!showPassword)
+                                        }
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                    >
+                                        {showPassword ? (
+                                            <RiEyeOffLine size={20} />
+                                        ) : (
+                                            <RiEyeLine size={20} />
+                                        )}
+                                    </button>
+                                </div>
+
+                                {/* Password strength indicator */}
+                                {data.password && (
+                                    <div className="mt-2">
+                                        <div className="flex justify-between mb-1">
+                                            <span className="text-xs text-gray-500">
+                                                Kekuatan Password:
+                                            </span>
+                                            <span className="text-xs font-medium">
+                                                {passwordStrength === 0 &&
+                                                    "Sangat lemah"}
+                                                {passwordStrength === 1 &&
+                                                    "Lemah"}
+                                                {passwordStrength === 2 &&
+                                                    "Sedang"}
+                                                {passwordStrength === 3 &&
+                                                    "Kuat"}
+                                                {passwordStrength === 4 &&
+                                                    "Sangat kuat"}
+                                            </span>
+                                        </div>
+                                        <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                            <div
+                                                className={`h-full transition-all duration-300 ${
+                                                    passwordStrength === 0
+                                                        ? "bg-red-500 w-[10%]"
+                                                        : passwordStrength === 1
+                                                        ? "bg-orange-500 w-[25%]"
+                                                        : passwordStrength === 2
+                                                        ? "bg-yellow-500 w-[50%]"
+                                                        : passwordStrength === 3
+                                                        ? "bg-lime-500 w-[75%]"
+                                                        : "bg-green-500 w-full"
+                                                }`}
+                                            ></div>
                                         </div>
 
-                                        <div className="flex flex-col sm:flex-row items-center justify-center mt-4 space-y-2 sm:space-y-0 sm:space-x-4">
-                                            <div className="flex items-center text-xs text-gray-600">
-                                                <svg
-                                                    className="h-4 w-4 mr-1 text-green-500"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
+                                        {/* Password requirements */}
+                                        <div className="mt-2 grid grid-cols-2 gap-1">
+                                            <div className="flex items-center text-xs">
+                                                <div
+                                                    className={`w-3 h-3 rounded-full mr-1.5 transition-colors ${
+                                                        data.password.length >=
+                                                        8
+                                                            ? "bg-green-500"
+                                                            : "bg-gray-300"
+                                                    }`}
+                                                ></div>
+                                                <span
+                                                    className={
+                                                        data.password.length >=
+                                                        8
+                                                            ? "text-gray-700"
+                                                            : "text-gray-500"
+                                                    }
                                                 >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M5 13l4 4L19 7"
-                                                    />
-                                                </svg>
-                                                <span>Free 14-day trial</span>
+                                                    Minimal 8 karakter
+                                                </span>
                                             </div>
-
-                                            <div className="flex items-center text-xs text-gray-600">
-                                                <svg
-                                                    className="h-4 w-4 mr-1 text-green-500"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
+                                            <div className="flex items-center text-xs">
+                                                <div
+                                                    className={`w-3 h-3 rounded-full mr-1.5 transition-colors ${
+                                                        /[A-Z]/.test(
+                                                            data.password
+                                                        )
+                                                            ? "bg-green-500"
+                                                            : "bg-gray-300"
+                                                    }`}
+                                                ></div>
+                                                <span
+                                                    className={
+                                                        /[A-Z]/.test(
+                                                            data.password
+                                                        )
+                                                            ? "text-gray-700"
+                                                            : "text-gray-500"
+                                                    }
                                                 >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M5 13l4 4L19 7"
-                                                    />
-                                                </svg>
-                                                <span>
-                                                    No credit card required
+                                                    Huruf kapital
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center text-xs">
+                                                <div
+                                                    className={`w-3 h-3 rounded-full mr-1.5 transition-colors ${
+                                                        /[0-9]/.test(
+                                                            data.password
+                                                        )
+                                                            ? "bg-green-500"
+                                                            : "bg-gray-300"
+                                                    }`}
+                                                ></div>
+                                                <span
+                                                    className={
+                                                        /[0-9]/.test(
+                                                            data.password
+                                                        )
+                                                            ? "text-gray-700"
+                                                            : "text-gray-500"
+                                                    }
+                                                >
+                                                    Angka
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center text-xs">
+                                                <div
+                                                    className={`w-3 h-3 rounded-full mr-1.5 transition-colors ${
+                                                        /[^A-Za-z0-9]/.test(
+                                                            data.password
+                                                        )
+                                                            ? "bg-green-500"
+                                                            : "bg-gray-300"
+                                                    }`}
+                                                ></div>
+                                                <span
+                                                    className={
+                                                        /[^A-Za-z0-9]/.test(
+                                                            data.password
+                                                        )
+                                                            ? "text-gray-700"
+                                                            : "text-gray-500"
+                                                    }
+                                                >
+                                                    Karakter khusus
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                </motion.div>
+                                )}
 
-                                {/* Form Fields */}
-                                <div className="px-6 sm:px-8 space-y-6">
-                                    {/* Name Field */}
-                                    <div>
-                                        <InputLabel
-                                            htmlFor="name"
-                                            value="Full Name"
-                                            className="text-sm font-medium text-gray-700"
-                                        />
-                                        <div className="mt-1 relative rounded-md shadow-sm">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <User
-                                                    size={18}
-                                                    className="text-gray-400"
-                                                />
-                                            </div>
-                                            <TextInput
-                                                id="name"
-                                                name="name"
-                                                value={data.name}
-                                                className="pl-10 block w-full py-2 sm:py-3 pr-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 sm:text-sm"
-                                                autoComplete="name"
-                                                isFocused={true}
-                                                placeholder="John Doe"
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "name",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <AnimatePresence>
-                                            {errors.name && (
-                                                <motion.div
-                                                    initial={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                    }}
-                                                    animate={{
-                                                        opacity: 1,
-                                                        height: "auto",
-                                                    }}
-                                                    exit={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                    }}
-                                                >
-                                                    <InputError
-                                                        message={errors.name}
-                                                        className="mt-2 flex items-center"
-                                                    >
-                                                        <AlertCircle
-                                                            size={16}
-                                                            className="mr-1 flex-shrink-0"
-                                                        />
-                                                    </InputError>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-
-                                    {/* Email Field */}
-                                    <div>
-                                        <InputLabel
-                                            htmlFor="email"
-                                            value="Email Address"
-                                            className="text-sm font-medium text-gray-700"
-                                        />
-                                        <div className="mt-1 relative rounded-md shadow-sm">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <Mail
-                                                    size={18}
-                                                    className="text-gray-400"
-                                                />
-                                            </div>
-                                            <TextInput
-                                                id="email"
-                                                type="email"
-                                                name="email"
-                                                value={data.email}
-                                                className="pl-10 block w-full py-2 sm:py-3 pr-3 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 sm:text-sm"
-                                                autoComplete="username"
-                                                placeholder="name@company.com"
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "email",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                required
-                                            />
-                                        </div>
-                                        <AnimatePresence>
-                                            {errors.email && (
-                                                <motion.div
-                                                    initial={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                    }}
-                                                    animate={{
-                                                        opacity: 1,
-                                                        height: "auto",
-                                                    }}
-                                                    exit={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                    }}
-                                                >
-                                                    <InputError
-                                                        message={errors.email}
-                                                        className="mt-2 flex items-center"
-                                                    >
-                                                        <AlertCircle
-                                                            size={16}
-                                                            className="mr-1 flex-shrink-0"
-                                                        />
-                                                    </InputError>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-
-                                    {/* Password Field */}
-                                    <div>
-                                        <InputLabel
-                                            htmlFor="password"
-                                            value="Password"
-                                            className="text-sm font-medium text-gray-700"
-                                        />
-                                        <div className="mt-1 relative rounded-md shadow-sm">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <Lock
-                                                    size={18}
-                                                    className="text-gray-400"
-                                                />
-                                            </div>
-                                            <TextInput
-                                                id="password"
-                                                type={
-                                                    showPassword
-                                                        ? "text"
-                                                        : "password"
-                                                }
-                                                name="password"
-                                                value={data.password}
-                                                className="pl-10 block w-full py-2 sm:py-3 pr-10 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 sm:text-sm"
-                                                autoComplete="new-password"
-                                                placeholder="••••••••"
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "password",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                required
-                                            />
-                                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setShowPassword(
-                                                            !showPassword
-                                                        )
-                                                    }
-                                                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                                                    aria-label={
-                                                        showPassword
-                                                            ? "Hide password"
-                                                            : "Show password"
-                                                    }
-                                                >
-                                                    {showPassword ? (
-                                                        <EyeOff
-                                                            size={18}
-                                                            aria-hidden="true"
-                                                        />
-                                                    ) : (
-                                                        <Eye
-                                                            size={18}
-                                                            aria-hidden="true"
-                                                        />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <AnimatePresence>
-                                            {errors.password && (
-                                                <motion.div
-                                                    initial={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                    }}
-                                                    animate={{
-                                                        opacity: 1,
-                                                        height: "auto",
-                                                    }}
-                                                    exit={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                    }}
-                                                >
-                                                    <InputError
-                                                        message={
-                                                            errors.password
-                                                        }
-                                                        className="mt-2 flex items-center"
-                                                    >
-                                                        <AlertCircle
-                                                            size={16}
-                                                            className="mr-1 flex-shrink-0"
-                                                        />
-                                                    </InputError>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-
-                                        {/* Password strength indicator */}
-                                        {data.password && !errors.password && (
-                                            <div className="mt-2">
-                                                <div className="flex space-x-1 mb-1">
-                                                    {[...Array(4)].map(
-                                                        (_, i) => (
-                                                            <div
-                                                                key={i}
-                                                                className={`h-1 rounded-full flex-1 ${
-                                                                    i <
-                                                                    passwordStrength
-                                                                        ? [
-                                                                              "bg-red-400",
-                                                                              "bg-orange-400",
-                                                                              "bg-yellow-400",
-                                                                              "bg-green-400",
-                                                                          ][
-                                                                              passwordStrength -
-                                                                                  1
-                                                                          ]
-                                                                        : "bg-gray-200"
-                                                                }`}
-                                                            />
-                                                        )
-                                                    )}
-                                                </div>
-                                                <p className="text-xs text-gray-500">
-                                                    {passwordStrength < 2 &&
-                                                        "Weak password"}
-                                                    {passwordStrength === 2 &&
-                                                        "Medium password"}
-                                                    {passwordStrength === 3 &&
-                                                        "Strong password"}
-                                                    {passwordStrength === 4 &&
-                                                        "Very strong password"}
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Confirm Password Field */}
-                                    <div>
-                                        <InputLabel
-                                            htmlFor="password_confirmation"
-                                            value="Confirm Password"
-                                            className="text-sm font-medium text-gray-700"
-                                        />
-                                        <div className="mt-1 relative rounded-md shadow-sm">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <Lock
-                                                    size={18}
-                                                    className="text-gray-400"
-                                                />
-                                            </div>
-                                            <TextInput
-                                                id="password_confirmation"
-                                                type={
-                                                    showPasswordConfirmation
-                                                        ? "text"
-                                                        : "password"
-                                                }
-                                                name="password_confirmation"
-                                                value={
-                                                    data.password_confirmation
-                                                }
-                                                className="pl-10 block w-full py-2 sm:py-3 pr-10 border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 sm:text-sm"
-                                                autoComplete="new-password"
-                                                placeholder="••••••••"
-                                                onChange={(e) =>
-                                                    setData(
-                                                        "password_confirmation",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                required
-                                            />
-                                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setShowPasswordConfirmation(
-                                                            !showPasswordConfirmation
-                                                        )
-                                                    }
-                                                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                                                    aria-label={
-                                                        showPasswordConfirmation
-                                                            ? "Hide password"
-                                                            : "Show password"
-                                                    }
-                                                >
-                                                    {showPasswordConfirmation ? (
-                                                        <EyeOff
-                                                            size={18}
-                                                            aria-hidden="true"
-                                                        />
-                                                    ) : (
-                                                        <Eye
-                                                            size={18}
-                                                            aria-hidden="true"
-                                                        />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <AnimatePresence>
-                                            {errors.password_confirmation && (
-                                                <motion.div
-                                                    initial={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                    }}
-                                                    animate={{
-                                                        opacity: 1,
-                                                        height: "auto",
-                                                    }}
-                                                    exit={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                    }}
-                                                >
-                                                    <InputError
-                                                        message={
-                                                            errors.password_confirmation
-                                                        }
-                                                        className="mt-2 flex items-center"
-                                                    >
-                                                        <AlertCircle
-                                                            size={16}
-                                                            className="mr-1 flex-shrink-0"
-                                                        />
-                                                    </InputError>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-
-                                    {/* Password match indicator */}
-                                    {data.password &&
-                                        data.password_confirmation && (
-                                            <div className="flex items-center text-sm">
-                                                {data.password ===
-                                                data.password_confirmation ? (
-                                                    <div className="text-green-600 flex items-center">
-                                                        <Check
-                                                            size={16}
-                                                            className="mr-1"
-                                                        />
-                                                        Passwords match
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-red-600 flex items-center">
-                                                        <AlertCircle
-                                                            size={16}
-                                                            className="mr-1"
-                                                        />
-                                                        Passwords do not match
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                    {/* Submit Button and Login Link */}
-                                    <div className="pt-2">
-                                        <motion.button
-                                            type="submit"
-                                            disabled={processing}
-                                            whileHover={{ scale: 1.01 }}
-                                            whileTap={{ scale: 0.99 }}
-                                            className="group relative w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-150 ease-in-out shadow-md hover:shadow-lg disabled:opacity-70"
+                                <AnimatePresence>
+                                    {errors.password && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -5 }}
+                                            className="flex items-center text-red-500 text-xs mt-1"
                                         >
-                                            <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                                                {processing ? (
-                                                    <Loader
-                                                        size={18}
-                                                        className="animate-spin text-blue-300"
-                                                    />
-                                                ) : (
-                                                    <UserPlus
-                                                        size={18}
-                                                        className="text-indigo-200 group-hover:text-indigo-100"
-                                                    />
-                                                )}
-                                            </span>
-                                            {processing
-                                                ? "Creating account..."
-                                                : "Create Account"}
-                                        </motion.button>
+                                            <AlertCircle
+                                                size={14}
+                                                className="mr-1"
+                                            />
+                                            <span>{errors.password}</span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
 
-                                        <div className="mt-6 text-center">
-                                            <p className="text-sm text-gray-600">
-                                                Already have an account?{" "}
-                                                <Link
-                                                    href={route("login")}
-                                                    className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
-                                                >
-                                                    Sign in
-                                                </Link>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Security Note */}
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.5, delay: 0.3 }}
-                                    className="text-center mt-4 mb-6 px-6"
+                            {/* Confirm Password Input */}
+                            <div>
+                                <label
+                                    className="block text-gray-700 mb-1 text-sm font-medium"
+                                    htmlFor="password_confirmation"
                                 >
-                                    <p className="text-xs text-gray-500 flex items-center justify-center">
+                                    Konfirmasi Password
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <Shield
-                                            size={16}
-                                            className="mr-1 text-gray-400"
+                                            size={18}
+                                            className="text-gray-400"
                                         />
-                                        Your information is secure - We use
-                                        encryption to protect your data
-                                    </p>
-                                </motion.div>
-                            </form>
+                                    </div>
+                                    <input
+                                        id="password_confirmation"
+                                        className={`w-full pl-10 pr-12 py-3 border ${
+                                            errors.password_confirmation
+                                                ? "border-red-500"
+                                                : "border-gray-300"
+                                        } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/60`}
+                                        placeholder="Masukkan password lagi"
+                                        type={
+                                            showPasswordConfirmation
+                                                ? "text"
+                                                : "password"
+                                        }
+                                        name="password_confirmation"
+                                        value={data.password_confirmation}
+                                        onChange={(e) =>
+                                            setData(
+                                                "password_confirmation",
+                                                e.target.value
+                                            )
+                                        }
+                                        disabled={processing}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowPasswordConfirmation(
+                                                !showPasswordConfirmation
+                                            )
+                                        }
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                                    >
+                                        {showPasswordConfirmation ? (
+                                            <RiEyeOffLine size={20} />
+                                        ) : (
+                                            <RiEyeLine size={20} />
+                                        )}
+                                    </button>
+                                </div>
+                                <AnimatePresence>
+                                    {errors.password_confirmation && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -5 }}
+                                            className="flex items-center text-red-500 text-xs mt-1"
+                                        >
+                                            <AlertCircle
+                                                size={14}
+                                                className="mr-1"
+                                            />
+                                            <span>
+                                                {errors.password_confirmation}
+                                            </span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            {/* Submit Button */}
+                            <motion.button
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 }}
+                                className={`w-full py-3 rounded-lg font-semibold flex justify-center items-center 
+                                ${
+                                    processing
+                                        ? "bg-blue-400 text-white cursor-not-allowed"
+                                        : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg"
+                                } transition duration-300 mt-2`}
+                                type="submit"
+                                disabled={processing}
+                            >
+                                {processing ? (
+                                    <div className="flex items-center">
+                                        <Loader className="animate-spin h-5 w-5 mr-2" />
+                                        <span>Memproses...</span>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center">
+                                        <UserPlus className="mr-2" size={20} />
+                                        <span>Daftar</span>
+                                    </div>
+                                )}
+                            </motion.button>
+                        </form>
+
+                        {/* Or Sign Up with */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.7 }}
+                            className="flex items-center my-6"
+                        >
+                            <div className="flex-grow border-t border-gray-200"></div>
+                            <span className="mx-4 text-gray-500 text-sm font-medium">
+                                Atau daftar dengan
+                            </span>
+                            <div className="flex-grow border-t border-gray-200"></div>
+                        </motion.div>
+
+                        {/* Social Media Registration Button */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.8 }}
+                            className="space-y-4"
+                        >
+                            <button
+                                type="button"
+                                className="w-full flex items-center justify-center gap-3 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-300"
+                                onClick={() =>
+                                    (window.location.href =
+                                        route("auth.google"))
+                                }
+                            >
+                                <img
+                                    src="/google.svg"
+                                    alt="Google"
+                                    className="w-5 h-5"
+                                />
+                                <span className="font-medium text-gray-700">
+                                    Daftar dengan Google
+                                </span>
+                            </button>
+
+                            <div className="mt-6 text-center text-gray-500 text-sm">
+                                Sudah punya akun?{" "}
+                                <Link
+                                    href={route("login")}
+                                    className="text-blue-500 font-medium hover:text-blue-700 transition"
+                                >
+                                    Masuk disini
+                                </Link>
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    {/* Right Section - Illustration */}
+                    <div className="hidden md:flex md:w-5/12 lg:w-1/2 bg-gradient-to-br from-[#089BFF] to-[#0470b8] text-white p-8 rounded-r-2xl relative overflow-hidden flex-col justify-center">
+                        <div className="relative z-10">
+                            <div className="text-center mb-10">
+                                <h2 className="text-3xl font-bold mb-4">
+                                    Atur Keuangan dengan Mudah
+                                </h2>
+                                <p className="text-white/90 text-lg">
+                                    Mulai perjalanan finansial yang lebih baik
+                                    dengan EconoMate, teman terbaik untuk
+                                    merencanakan masa depan finansial Anda.
+                                </p>
+                            </div>
                         </div>
-                    </motion.div>
-                </div>
+
+                        <div className="flex flex-col items-center justify-center relative z-10">
+                            <img
+                                alt="EconoMate logo"
+                                className="mb-6"
+                                src="/logo-2.png"
+                                width={240}
+                                height={240}
+                            />
+
+                            <div className="mt-5 flex space-x-4">
+                                <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl text-center flex-1">
+                                    <h3 className="text-lg font-semibold mb-1">
+                                        Cepat
+                                    </h3>
+                                    <p className="text-white/80 text-sm">
+                                        Langsung akses fitur
+                                    </p>
+                                </div>
+                                <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl text-center flex-1">
+                                    <h3 className="text-lg font-semibold mb-1">
+                                        Mudah
+                                    </h3>
+                                    <p className="text-white/80 text-sm">
+                                        Antarmuka ramah pengguna
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Abstract shapes */}
+                        <div className="absolute -bottom-20 -right-20 w-64 h-64 rounded-full bg-blue-400/20"></div>
+                        <div className="absolute top-10 -right-20 w-40 h-40 rounded-full bg-blue-400/20"></div>
+                    </div>
+                </motion.div>
             </div>
         </GuestLayout>
     );

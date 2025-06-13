@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
-import Navbar from "@/Components/Navbar";
 import Footer from "@/Components/Footer";
 import { ArrowUp } from "lucide-react";
+import Navbar from "@/Components/Navbar";
 
 interface GuestLayoutProps {
     showNavbar?: boolean;
@@ -54,37 +54,34 @@ export default function GuestLayout({
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
-            {/* Navbar */}
-            {showNavbar && <Navbar />}
-
-            {/* Scroll Progress Indicator */}
+        <div className="flex flex-col min-h-screen bg-white">
+            {/* Scroll Progress Indicator - Positioned above all content */}
             {withScrollIndicator && (
-                <div className="fixed top-0 left-0 w-full h-1 z-50">
+                <div className="fixed top-0 left-0 w-full h-1 z-[100]">
                     <div
-                        className="h-full bg-blue-600 transition-all duration-150 ease-out"
+                        className="h-full bg-[#089BFF] transition-all duration-150 ease-out"
                         style={{ width: `${scrollProgress}%` }}
                     ></div>
                 </div>
             )}
 
-            {/* Page Content */}
-            <main className="flex-grow pt-16">
-                {/* Container for page content */}
-                <div className="w-full mx-auto">{children}</div>
-            </main>
+            {/* Navbar */}
+            {showNavbar && <Navbar />}
+
+            {/* Page Content - No extra padding/margin at top */}
+            <main className="flex-grow">{children}</main>
 
             {/* Footer */}
             {showFooter && <Footer />}
 
-            {/* Scroll to top button */}
+            {/* Scroll to top button - improved design */}
             {showScrollTop && (
                 <button
                     onClick={scrollToTop}
-                    className="fixed bottom-6 right-6 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 z-40"
+                    className="fixed bottom-6 right-6 p-3 rounded-full bg-gradient-to-r from-[#089BFF] to-[#0081d6] text-white shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-all duration-300 z-40 animate-fadeIn"
                     aria-label="Scroll to top"
                 >
-                    <ArrowUp size={20} />
+                    <ArrowUp size={20} className="animate-bounce" />
                 </button>
             )}
         </div>
