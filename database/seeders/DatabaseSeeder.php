@@ -20,31 +20,12 @@ class DatabaseSeeder extends Seeder
 
         $admin = User::factory()->create([
             'name' => 'Admin User',
-            'email' => 'admin@smart.com',
+            'email' => 'admin@admin.com',
             'password' => bcrypt('password'),
             'address' => '123 Admin St',
             'phone' => '123-456-7890',
         ]);
 
         $admin->assignRole('admin');
-
-        $manager = User::factory()->create([
-            'name' => 'Manager User',
-            'email' => 'manager@smart.com',
-            'password' => bcrypt('password'),
-            'address' => '456 Manager St',
-            'phone' => '987-654-3210',
-        ]);
-        $manager->assignRole('manager');
-
-        $sales = User::factory()->create([
-            'name' => 'Sales User',
-            'email' => 'sales@smart.com',
-            'password' => bcrypt('password'),
-            'address' => '789 Sales St',
-            'phone' => '456-789-0123',
-        ]);
-
-        $sales->assignRole('sales');
     }
 }
