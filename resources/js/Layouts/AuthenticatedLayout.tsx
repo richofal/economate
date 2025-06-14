@@ -18,7 +18,6 @@ export default function AuthenticatedLayout({
             <Head title={title} />
 
             <div className="flex h-screen bg-gray-50">
-                {/* Sidebar for larger screens */}
                 <div
                     className={`hidden md:block ${
                         sidebarOpen ? "w-64" : "w-0"
@@ -26,16 +25,12 @@ export default function AuthenticatedLayout({
                 >
                     <Sidebar />
                 </div>
-
-                {/* Mobile sidebar backdrop */}
                 {sidebarOpen && (
                     <div
                         className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
                         onClick={() => setSidebarOpen(false)}
                     />
                 )}
-
-                {/* Mobile sidebar */}
                 <div
                     className={`md:hidden fixed inset-y-0 left-0 transform ${
                         sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -59,11 +54,9 @@ export default function AuthenticatedLayout({
                                 {title}
                             </h1>
                             <div className="w-8"></div>{" "}
-                            {/* Empty div for spacing */}
                         </div>
                     </header>
 
-                    {/* Page content */}
                     <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
                         {children}
                     </main>

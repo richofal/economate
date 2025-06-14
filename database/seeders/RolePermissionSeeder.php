@@ -16,18 +16,52 @@ class RolePermissionSeeder extends Seeder
         // Create roles
         $adminRole = Role::create(['name' => 'admin']);
         $userRole = Role::create(['name' => 'user']);
-
-        // Create permissions
-        $permissions = [
-            // Dashboard
-            'view-dashboard',
+        $models = [
+            'wallets',
+            'users',
+            'user-wallets',
+            'transactions',
+            'budget-plans'
         ];
 
-        // Assign permissions to roles
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+        $allPermissions = [];
+        foreach ($models as $model) {
+            $permissionNames = [
+                'view-any-' . $model,
+                'view-' . $model,
+                'create-' . $model,
+                'update-' . $model,
+                'delete-' . $model
+            ];
+
+            $permissionNames[] = 'view-dashboard';
+
+            foreach ($permissionNames as $permissionName) {
+                Permission::firstOrCreate(['name' => $permissionName]);
+                $allPermissions[] = $permissionName;
+            }
         }
-        $adminRole->givePermissionTo($permissions);
-        $userRole->givePermissionTo('view-dashboard');
+
+        $userPermissions = [
+            'view-dashboard',
+            'view-any-user-wallets',
+            'create-user-wallets',
+            'update-user-wallets',
+            'delete-user-wallets',
+            'view-user-wallets',
+            'view-any-transactions',
+            'view-transactions',
+            'create-transactions',
+            'update-transactions',
+            'delete-transactions',
+            'view-any-budget-plans',
+            'view-budget-plans',
+            'create-budget-plans',
+            'update-budget-plans',
+            'delete-budget-plans'
+        ];
+
+        $adminRole->givePermissionTo($allPermissions);
+        $userRole->givePermissionTo($userPermissions);
     }
 }
