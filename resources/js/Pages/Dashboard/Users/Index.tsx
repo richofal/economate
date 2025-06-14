@@ -494,9 +494,47 @@ const UsersIndex = () => {
                                                     <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                                                         {user.image ? (
                                                             <img
-                                                                src={user.image}
+                                                                src={
+                                                                    user.image.startsWith(
+                                                                        "http"
+                                                                    )
+                                                                        ? user.image
+                                                                        : `/storage/${user.image}`
+                                                                }
                                                                 alt={user.name}
                                                                 className="w-full h-full object-cover"
+                                                                onError={(
+                                                                    e
+                                                                ) => {
+                                                                    // Fallback to default user image if loading fails
+                                                                    e.currentTarget.onerror =
+                                                                        null;
+                                                                    e.currentTarget.style.display =
+                                                                        "none";
+                                                                    const parent =
+                                                                        e
+                                                                            .currentTarget
+                                                                            .parentElement;
+                                                                    if (
+                                                                        parent
+                                                                    ) {
+                                                                        const defaultImage =
+                                                                            document.createElement(
+                                                                                "div"
+                                                                            );
+                                                                        defaultImage.className =
+                                                                            "w-full h-full flex items-center justify-center";
+                                                                        defaultImage.innerHTML = `<div class="text-gray-400 font-medium text-sm">${user.name
+                                                                            .substring(
+                                                                                0,
+                                                                                2
+                                                                            )
+                                                                            .toUpperCase()}</div>`;
+                                                                        parent.appendChild(
+                                                                            defaultImage
+                                                                        );
+                                                                    }
+                                                                }}
                                                             />
                                                         ) : (
                                                             <DefaultUserImage

@@ -47,6 +47,7 @@ const Sidebar = () => {
                 icon: <Home size={18} />,
                 route: route("dashboard"),
                 permission: "view-dashboard",
+                
             },
             {
                 section: "Manajemen",
