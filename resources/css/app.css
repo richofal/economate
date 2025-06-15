@@ -64,6 +64,11 @@
         @apply bg-background text-foreground;
     }
 }
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 72px;
+}
 @media (max-width: 640px) {
     .container {
         padding-left: 0.75rem;
@@ -77,22 +82,18 @@
     }
 }
 
-/* Scrollbar styles for mobile sidebar */
-.mobile-sidebar::-webkit-scrollbar {
-    width: 4px;
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
 }
-
-.mobile-sidebar::-webkit-scrollbar-track {
-    background: #f1f1f1;
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
 }
-
-.mobile-sidebar::-webkit-scrollbar-thumb {
-    background: #ddd;
-    border-radius: 4px;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
 }
-
-.mobile-sidebar::-webkit-scrollbar-thumb:hover {
-    background: #ccc;
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
 /* Better touch targets on mobile */

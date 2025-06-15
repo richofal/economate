@@ -1,13 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import { Transition } from "@headlessui/react";
+import DefaultUserImage from "./DefaultUserImage";
 
 const Navbar: React.FC = () => {
+    const scrollToSection = (sectionId: string, event: React.MouseEvent) => {
+        event.preventDefault();
+        if (isMenuOpen) toggleMenu();
+        if (window.location.pathname === "/") {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: "smooth" });
+            }
+        } else {
+            window.location.href = `/?section=${sectionId}`;
+        }
+    };
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const { auth } = usePage().props;
+
+    console.log(auth.user);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const section = params.get("section");
+
+        if (section) {
+            setTimeout(() => {
+                const element = document.getElementById(section);
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                    window.history.replaceState(
+                        {},
+                        document.title,
+                        window.location.pathname
+                    );
+                }
+            }, 500);
+        }
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -54,7 +88,9 @@ const Navbar: React.FC = () => {
                     <img
                         alt="Logo of EconoMate"
                         className="transition-all duration-300"
-                        src={isScrolled ? "/logo.png" : "/logo.png"}
+                        src={
+                            isScrolled ? "/images/logo.png" : "/images/logo.png"
+                        }
                         width={150}
                         height={40}
                     />
@@ -75,48 +111,27 @@ const Navbar: React.FC = () => {
                     >
                         Home
                     </Link>
-                    <Link
-                        href="/features"
+                    <a
+                        href="#layanan-section"
                         className={`text-[16px] font-medium hover:opacity-80 transition duration-300 ${
                             isScrolled
-                                ? isActive("/features")
+                                ? isActive("/layanan")
                                     ? "text-[#089BFF] font-bold"
                                     : "text-gray-700"
                                 : "text-white"
                         }`}
-                        onClick={startLoading}
+                        onClick={(e) => scrollToSection("layanan-section", e)}
                     >
-                        Fitur
-                    </Link>
-                    <Link
-                        href="/pricing"
-                        className={`text-[16px] font-medium hover:opacity-80 transition duration-300 ${
-                            isScrolled
-                                ? isActive("/pricing")
-                                    ? "text-[#089BFF] font-bold"
-                                    : "text-gray-700"
-                                : "text-white"
-                        }`}
-                        onClick={startLoading}
-                    >
-                        Harga
-                    </Link>
-
+                        Layanan
+                    </a>
                     {auth?.user ? (
                         <div className="relative">
                             <button
                                 onClick={toggleUserMenu}
-                                className="flex items-center space-x-2"
+                                className="flex items-center space-x-2 group"
                             >
-                                <div
-                                    className={`h-9 w-9 rounded-full flex items-center justify-center bg-blue-100 ${
-                                        isScrolled
-                                            ? "text-[#089BFF]"
-                                            : "text-white bg-blue-500"
-                                    }`}
-                                >
-                                    {auth.user.name?.charAt(0).toUpperCase() ||
-                                        "U"}
+                                <div className="h-9 w-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-transparent group-hover:ring-blue-200 transition-all duration-200">
+                                    <DefaultUserImage user={auth.user} />
                                 </div>
                                 <span
                                     className={
@@ -127,7 +142,7 @@ const Navbar: React.FC = () => {
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5"
+                                        className="h-5 w-5 transition-transform duration-200 group-hover:rotate-180"
                                         viewBox="0 0 20 20"
                                         fill="currentColor"
                                     >
@@ -149,36 +164,87 @@ const Navbar: React.FC = () => {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                             >
-                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
-                                    <div className="px-4 py-2 border-b">
-                                        <p className="text-sm text-gray-700">
-                                            Signed in as
-                                        </p>
-                                        <p className="text-sm font-medium text-gray-900 truncate">
-                                            {auth.user.email}
-                                        </p>
+                                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl py-1 ring-1 ring-black ring-opacity-5 z-50">
+                                    <div className="px-4 py-3 border-b border-gray-100">
+                                        <div className="flex items-center space-x-3">
+                                            <div className="h-12 w-12 rounded-full overflow-hidden">
+                                                <DefaultUserImage
+                                                    user={auth.user}
+                                                />
+                                            </div>
+                                            <div className="overflow-hidden">
+                                                <p className="text-sm font-medium text-gray-900 truncate">
+                                                    {auth.user.name}
+                                                </p>
+                                                <p className="text-xs text-gray-500 truncate">
+                                                    {auth.user.email}
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                     <Link
-                                        href="/dashboard"
-                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        href={route("dashboard")}
+                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                                         onClick={startLoading}
                                     >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-4 w-4 mr-2.5 text-gray-500"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+                                            />
+                                        </svg>
                                         Dashboard
                                     </Link>
                                     <Link
-                                        href="/profile"
-                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        href={route("profile.index")}
+                                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                                         onClick={startLoading}
                                     >
-                                        Profile
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-4 w-4 mr-2.5 text-gray-500"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                            />
+                                        </svg>
+                                        Profil Saya
                                     </Link>
+                                    <div className="border-t border-gray-100 my-1"></div>
                                     <Link
-                                        href="/logout"
-                                        method="post"
+                                        href={route("logout")}
                                         as="button"
-                                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 border-t"
+                                        className="flex items-center w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                                     >
-                                        Logout
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-4 w-4 mr-2.5"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                            />
+                                        </svg>
+                                        Keluar
                                     </Link>
                                 </div>
                             </Transition>
@@ -275,42 +341,24 @@ const Navbar: React.FC = () => {
                         >
                             Home
                         </Link>
-                        <Link
-                            href="/features"
+                        <a
+                            href="#layanan-section"
                             className={`text-gray-800 text-lg py-3 border-b border-gray-100 ${
                                 isActive("/features")
                                     ? "font-bold text-[#089BFF]"
                                     : ""
                             }`}
-                            onClick={() => {
-                                toggleMenu();
-                                startLoading();
-                            }}
+                            onClick={(e) =>
+                                scrollToSection("layanan-section", e)
+                            }
                         >
-                            Fitur
-                        </Link>
-                        <Link
-                            href="/pricing"
-                            className={`text-gray-800 text-lg py-3 border-b border-gray-100 ${
-                                isActive("/pricing")
-                                    ? "font-bold text-[#089BFF]"
-                                    : ""
-                            }`}
-                            onClick={() => {
-                                toggleMenu();
-                                startLoading();
-                            }}
-                        >
-                            Harga
-                        </Link>
-
+                            Layanan
+                        </a>
                         {auth?.user ? (
                             <div className="border-t border-gray-100 pt-4 mt-2">
                                 <div className="flex items-center mb-4 space-x-3">
-                                    <div className="h-10 w-10 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center font-medium">
-                                        {auth.user.name
-                                            ?.charAt(0)
-                                            .toUpperCase() || "U"}
+                                    <div className="h-12 w-12 rounded-full overflow-hidden">
+                                        <DefaultUserImage user={auth.user} />
                                     </div>
                                     <div>
                                         <p className="font-medium">
@@ -322,39 +370,80 @@ const Navbar: React.FC = () => {
                                     </div>
                                 </div>
                                 <Link
-                                    href="/dashboard"
-                                    className="block text-gray-700 py-3 border-t border-gray-100"
+                                    href={route("profile.index")}
+                                    className="flex items-center text-gray-700 py-3 border-t border-gray-100"
                                     onClick={() => {
                                         toggleMenu();
                                         startLoading();
                                     }}
                                 >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5 mr-2.5 text-gray-500"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                        />
+                                    </svg>
+                                    Profil Saya
+                                </Link>
+                                <Link
+                                    href={route("dashboard")}
+                                    className="flex items-center text-gray-700 py-3 border-t border-gray-100"
+                                    onClick={() => {
+                                        toggleMenu();
+                                        startLoading();
+                                    }}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5 mr-2.5 text-gray-500"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+                                        />
+                                    </svg>
                                     Dashboard
                                 </Link>
                                 <Link
-                                    href="/profile"
-                                    className="block text-gray-700 py-3 border-t border-gray-100"
-                                    onClick={() => {
-                                        toggleMenu();
-                                        startLoading();
-                                    }}
-                                >
-                                    Profile
-                                </Link>
-                                <Link
-                                    href="/logout"
-                                    method="post"
+                                    href={route("logout")}
                                     as="button"
-                                    className="w-full text-left text-red-600 py-3 border-t border-gray-100"
+                                    className="flex items-center w-full text-left text-red-600 py-3 border-t border-gray-100"
                                     onClick={() => toggleMenu()}
                                 >
-                                    Logout
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5 mr-2.5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                        />
+                                    </svg>
+                                    Keluar
                                 </Link>
                             </div>
                         ) : (
                             <div className="flex flex-col space-y-3 mt-4">
                                 <Link
-                                    href="/login"
+                                    href={route("login")}
                                     className="border border-[#089BFF] text-[#089BFF] py-3 px-4 rounded-lg text-center text-[16px]"
                                     onClick={() => {
                                         toggleMenu();

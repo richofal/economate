@@ -1,4 +1,4 @@
-import { useForm, usePage } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import { FormEvent, useState, ChangeEvent, useRef, useEffect } from "react";
 import { PageProps, User } from "@/types";
 import { Button } from "@/Components/ui/button";
@@ -13,7 +13,6 @@ import {
     Calendar,
     User as UserIcon,
     Camera,
-    Pencil,
     X,
     Upload,
     Clock,
@@ -21,6 +20,7 @@ import {
     Venus,
 } from "lucide-react";
 import { Transition } from "@headlessui/react";
+import { formatDate } from "@/lib/utils";
 
 export default function UpdateProfileInformationForm({
     className = "",
@@ -63,12 +63,6 @@ export default function UpdateProfileInformationForm({
         image: null as File | null,
         _remove_image: false as boolean,
     });
-
-    // Format birthday for display
-    const formatDate = (date: string | null | undefined): string => {
-        if (!date) return "";
-        return date;
-    };
 
     useEffect(() => {
         if (recentlySuccessful) {
@@ -480,8 +474,7 @@ export default function UpdateProfileInformationForm({
                 <div className="flex items-center justify-between pt-5 border-t border-gray-200">
                     <p className="text-xs text-gray-500 flex items-center">
                         <Clock className="h-3.5 w-3.5 mr-1" />
-                        Terakhir diupdate:{" "}
-                        {formatDate(user.updated_at) || "Belum pernah"}
+                        Terakhir diupdate: {formatDate(user.updated_at || "")}
                     </p>
 
                     <div className="flex items-center gap-4">

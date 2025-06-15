@@ -5,29 +5,88 @@ import {
     Users,
     Calendar,
     BarChart2,
-    Mail,
     Clock,
-    Bell,
     PlusCircle,
-    Phone,
-    Search,
     FileText,
     CreditCard,
     Settings,
     ArrowUpRight,
     ChevronRight,
-    UserPlus,
     DollarSign,
     Wallet,
-    TrendingUp,
     Activity,
-    Layers,
     AlertCircle,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
+import { PageProps } from "@/types";
+import IncomeExpenseChart from "./Partials/IncomeExpenseChart";
+import ExpenseCategoryChart from "./Partials/ExpenseCategoryChart";
+import WalletBalanceChart from "./Partials/WalletBalanceChart";
+
+interface DashboardProps extends PageProps {
+    auth: any;
+    dashboardData: {
+        balance: {
+            total: number;
+            change: number;
+            isPositive: boolean;
+        };
+        chartData: {
+            incomeExpenseChartData: {
+                data: Array<{
+                    date: string;
+                    income: number;
+                    expense: number;
+                }>;
+                maxValue: number;
+            };
+            expensesByCategoryData: {
+                data: Array<{
+                    name: string;
+                    value: number;
+                    color: string;
+                    percentage: number;
+                }>;
+                total: number;
+            };
+            walletBalanceData: {
+                data: Array<{
+                    name: string;
+                    value: number;
+                    color: string;
+                    percentage: number;
+                }>;
+                total: number;
+            };
+        };
+        expensesByCategory: Array<{
+            name: string;
+            amount: number;
+            percentage: number;
+            color: string;
+        }>;
+        recentTransactions: Array<{
+            id: number;
+            name: string;
+            amount: number;
+            category: string;
+            date: string;
+            icon_color: string;
+        }>;
+        upcomingPayments: Array<{
+            id: number;
+            name: string;
+            amount: number;
+            date: string;
+            priority: string;
+        }>;
+        activeCategories: number;
+    };
+}
 
 export default function Dashboard() {
-    const { auth } = usePage().props;
+    const { auth, dashboardData } = usePage<DashboardProps>().props;
     const [greeting, setGreeting] = useState("");
     const [currentTime, setCurrentTime] = useState("");
     const [currentDate, setCurrentDate] = useState("");
@@ -89,112 +148,6 @@ export default function Dashboard() {
         },
     };
 
-    // Sample data for widgets
-    const dummyData = {
-        balance: {
-            total: "Rp 2.450.000",
-            change: "+12%",
-            isPositive: true,
-        },
-        expensesByCategory: [
-            {
-                name: "Makanan",
-                amount: 850000,
-                percentage: 35,
-                color: "bg-blue-500",
-            },
-            {
-                name: "Transportasi",
-                amount: 450000,
-                percentage: 18,
-                color: "bg-green-500",
-            },
-            {
-                name: "Belanja",
-                amount: 650000,
-                percentage: 26,
-                color: "bg-purple-500",
-            },
-            {
-                name: "Hiburan",
-                amount: 325000,
-                percentage: 13,
-                color: "bg-yellow-500",
-            },
-            {
-                name: "Lainnya",
-                amount: 175000,
-                percentage: 8,
-                color: "bg-gray-500",
-            },
-        ],
-        recentTransactions: [
-            {
-                id: 1,
-                name: "Belanja Bulanan",
-                amount: -350000,
-                category: "Belanja",
-                date: "12 Jun",
-                icon: <CreditCard size={16} className="text-purple-500" />,
-            },
-            {
-                id: 2,
-                name: "Gaji Bulanan",
-                amount: 2500000,
-                category: "Pendapatan",
-                date: "10 Jun",
-                icon: <DollarSign size={16} className="text-green-500" />,
-            },
-            {
-                id: 3,
-                name: "Pembayaran Internet",
-                amount: -250000,
-                category: "Tagihan",
-                date: "8 Jun",
-                icon: <Layers size={16} className="text-blue-500" />,
-            },
-            {
-                id: 4,
-                name: "Makan Siang",
-                amount: -85000,
-                category: "Makanan",
-                date: "8 Jun",
-                icon: <CreditCard size={16} className="text-yellow-500" />,
-            },
-            {
-                id: 5,
-                name: "Bonus Proyek",
-                amount: 750000,
-                category: "Pendapatan",
-                date: "5 Jun",
-                icon: <DollarSign size={16} className="text-green-500" />,
-            },
-        ],
-        upcomingPayments: [
-            {
-                id: 1,
-                name: "Pembayaran Netflix",
-                amount: 159000,
-                date: "18 Jun",
-                priority: "medium",
-            },
-            {
-                id: 2,
-                name: "Cicilan KPR",
-                amount: 1200000,
-                date: "20 Jun",
-                priority: "high",
-            },
-            {
-                id: 3,
-                name: "Listrik",
-                amount: 450000,
-                date: "24 Jun",
-                priority: "high",
-            },
-        ],
-    };
-
     // Priority badge colors
     const priorityColors = {
         high: "bg-red-100 text-red-700",
@@ -202,14 +155,29 @@ export default function Dashboard() {
         low: "bg-green-100 text-green-700",
     };
 
-    // Format number to IDR currency
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amount);
+    // Get transaction icon based on category or type
+    const getTransactionIcon = (transaction: any) => {
+        const iconColor = transaction.icon_color || "text-gray-500";
+
+        if (transaction.amount > 0) {
+            return <DollarSign size={16} className="text-green-500" />;
+        }
+
+        if (
+            transaction.category.toLowerCase().includes("makan") ||
+            transaction.category.toLowerCase().includes("food")
+        ) {
+            return <CreditCard size={16} className={iconColor} />;
+        }
+
+        if (
+            transaction.category.toLowerCase().includes("bill") ||
+            transaction.category.toLowerCase().includes("tagihan")
+        ) {
+            return <FileText size={16} className={iconColor} />;
+        }
+
+        return <CreditCard size={16} className={iconColor} />;
     };
 
     return (
@@ -244,21 +212,12 @@ export default function Dashboard() {
 
                             <div className="flex gap-2 md:gap-3">
                                 <Link
-                                    href=""
+                                    href={route("transactions.create")}
                                     className="flex items-center bg-white/15 hover:bg-white/20 text-white px-3 md:px-4 py-2 rounded-lg transition-colors duration-200"
                                 >
                                     <PlusCircle className="w-4 h-4 mr-1.5" />
                                     <span className="text-sm">
                                         Tambah Pemasukan
-                                    </span>
-                                </Link>
-                                <Link
-                                    href=""
-                                    className="flex items-center bg-white/10 hover:bg-white/15 text-white px-3 md:px-4 py-2 rounded-lg transition-colors duration-200"
-                                >
-                                    <CreditCard className="w-4 h-4 mr-1.5" />
-                                    <span className="text-sm">
-                                        Catat Pengeluaran
                                     </span>
                                 </Link>
                             </div>
@@ -276,7 +235,9 @@ export default function Dashboard() {
                                     Total Saldo
                                 </p>
                                 <p className="text-lg font-semibold">
-                                    {dummyData.balance.total}
+                                    {formatCurrency(
+                                        dashboardData.balance.total
+                                    )}
                                 </p>
                             </div>
                         </div>
@@ -290,8 +251,8 @@ export default function Dashboard() {
                                     Tren Bulan Ini
                                 </p>
                                 <p className="text-lg font-semibold flex items-center">
-                                    {dummyData.balance.change}
-                                    {dummyData.balance.isPositive ? (
+                                    {dashboardData.balance.change}%
+                                    {dashboardData.balance.isPositive ? (
                                         <ArrowUpRight className="w-4 h-4 ml-1 text-green-300" />
                                     ) : (
                                         <ArrowUpRight className="w-4 h-4 ml-1 text-red-300 transform rotate-90" />
@@ -308,7 +269,9 @@ export default function Dashboard() {
                                 <p className="text-xs text-blue-100">
                                     Kategori Aktif
                                 </p>
-                                <p className="text-lg font-semibold">12</p>
+                                <p className="text-lg font-semibold">
+                                    {dashboardData.activeCategories}
+                                </p>
                             </div>
                         </div>
 
@@ -321,14 +284,72 @@ export default function Dashboard() {
                                     Pembayaran Akan Datang
                                 </p>
                                 <p className="text-lg font-semibold">
-                                    {dummyData.upcomingPayments.length}
+                                    {dashboardData.upcomingPayments.length}
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </motion.div>
+            <div className="bg-white rounded-xl shadow-sm p-5 mb-6">
+                <div className="flex justify-between items-center mb-5">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        Pemasukan vs Pengeluaran
+                    </h2>
+                    <div className="text-sm text-gray-500">
+                        30 hari terakhir
+                    </div>
+                </div>
 
+                <div className="mt-4">
+                    <IncomeExpenseChart
+                        data={
+                            dashboardData.chartData.incomeExpenseChartData.data
+                        }
+                        maxValue={
+                            dashboardData.chartData.incomeExpenseChartData
+                                .maxValue
+                        }
+                        height={350}
+                    />
+                </div>
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5 mb-6">
+                <div className="flex justify-between items-center mb-5">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        Rincian Pengeluaran per Kategori
+                    </h2>
+                    <div className="text-sm text-gray-500">
+                        {new Date().toLocaleDateString("id-ID", {
+                            month: "long",
+                            year: "numeric",
+                        })}
+                    </div>
+                </div>
+
+                <ExpenseCategoryChart
+                    data={dashboardData.chartData.expensesByCategoryData.data}
+                    total={dashboardData.chartData.expensesByCategoryData.total}
+                    height={350}
+                />
+            </div>
+            <div className="bg-white rounded-xl shadow-sm p-5 mb-6">
+                <div className="flex justify-between items-center mb-5">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        Komposisi Saldo Dompet
+                    </h2>
+                </div>
+
+                <WalletBalanceChart
+                    data={dashboardData.chartData.walletBalanceData.data}
+                    total={dashboardData.chartData.walletBalanceData.total}
+                    height={Math.max(
+                        350,
+                        dashboardData.chartData.walletBalanceData.data.length *
+                            50
+                    )}
+                />
+            </div>
             {/* Main Dashboard Content */}
             <motion.div
                 className="grid grid-cols-1 lg:grid-cols-3 gap-6"
@@ -345,7 +366,7 @@ export default function Dashboard() {
                                 Transaksi Terbaru
                             </h2>
                             <Link
-                                href=""
+                                href={route("transactions.index")}
                                 className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                             >
                                 Lihat Semua <ChevronRight className="w-4 h-4" />
@@ -353,37 +374,52 @@ export default function Dashboard() {
                         </div>
 
                         <div className="space-y-3">
-                            {dummyData.recentTransactions.map((transaction) => (
-                                <div
-                                    key={transaction.id}
-                                    className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
-                                >
-                                    <div className="flex items-center">
-                                        <div className="p-2 rounded-lg bg-gray-100 mr-3">
-                                            {transaction.icon}
+                            {dashboardData.recentTransactions &&
+                            dashboardData.recentTransactions.length > 0 ? (
+                                dashboardData.recentTransactions.map(
+                                    (transaction) => (
+                                        <div
+                                            key={transaction.id}
+                                            className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                                        >
+                                            <div className="flex items-center">
+                                                <div className="p-2 rounded-lg bg-gray-100 mr-3">
+                                                    {getTransactionIcon(
+                                                        transaction
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-sm font-medium text-gray-900">
+                                                        {transaction.name}
+                                                    </h3>
+                                                    <p className="text-xs text-gray-500">
+                                                        {transaction.category} •{" "}
+                                                        {transaction.date}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div
+                                                className={`text-sm font-medium ${
+                                                    transaction.amount > 0
+                                                        ? "text-green-600"
+                                                        : "text-red-600"
+                                                }`}
+                                            >
+                                                {transaction.amount > 0
+                                                    ? "+"
+                                                    : ""}
+                                                {formatCurrency(
+                                                    transaction.amount
+                                                )}
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h3 className="text-sm font-medium text-gray-900">
-                                                {transaction.name}
-                                            </h3>
-                                            <p className="text-xs text-gray-500">
-                                                {transaction.category} •{" "}
-                                                {transaction.date}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div
-                                        className={`text-sm font-medium ${
-                                            transaction.amount > 0
-                                                ? "text-green-600"
-                                                : "text-red-600"
-                                        }`}
-                                    >
-                                        {transaction.amount > 0 ? "+" : ""}
-                                        {formatCurrency(transaction.amount)}
-                                    </div>
+                                    )
+                                )
+                            ) : (
+                                <div className="text-center py-6 text-gray-500">
+                                    Belum ada transaksi yang tercatat.
                                 </div>
-                            ))}
+                            )}
                         </div>
                     </div>
 
@@ -394,7 +430,7 @@ export default function Dashboard() {
                                 Pengeluaran Berdasarkan Kategori
                             </h2>
                             <Link
-                                href=""
+                                href={route("transactions.index")}
                                 className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                             >
                                 Analisis Detail{" "}
@@ -403,29 +439,39 @@ export default function Dashboard() {
                         </div>
 
                         <div className="space-y-4">
-                            {dummyData.expensesByCategory.map(
-                                (category, index) => (
-                                    <div key={index} className="flex flex-col">
-                                        <div className="flex justify-between items-center mb-1">
-                                            <span className="text-sm font-medium text-gray-700">
-                                                {category.name}
-                                            </span>
-                                            <span className="text-sm font-medium text-gray-900">
-                                                {formatCurrency(
-                                                    category.amount
-                                                )}
-                                            </span>
+                            {dashboardData.expensesByCategory &&
+                            dashboardData.expensesByCategory.length > 0 ? (
+                                dashboardData.expensesByCategory.map(
+                                    (category, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex flex-col"
+                                        >
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-sm font-medium text-gray-700">
+                                                    {category.name}
+                                                </span>
+                                                <span className="text-sm font-medium text-gray-900">
+                                                    {formatCurrency(
+                                                        category.amount
+                                                    )}
+                                                </span>
+                                            </div>
+                                            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                                                <div
+                                                    className={`h-full rounded-full ${category.color}`}
+                                                    style={{
+                                                        width: `${category.percentage}%`,
+                                                    }}
+                                                ></div>
+                                            </div>
                                         </div>
-                                        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                                            <div
-                                                className={`h-full rounded-full ${category.color}`}
-                                                style={{
-                                                    width: `${category.percentage}%`,
-                                                }}
-                                            ></div>
-                                        </div>
-                                    </div>
+                                    )
                                 )
+                            ) : (
+                                <div className="text-center py-6 text-gray-500">
+                                    Belum ada data pengeluaran untuk bulan ini.
+                                </div>
                             )}
                         </div>
                     </div>
@@ -440,7 +486,7 @@ export default function Dashboard() {
                                 Pembayaran Mendatang
                             </h2>
                             <Link
-                                href=""
+                                href={route("budgetPlans.index")}
                                 className="text-blue-600 hover:text-blue-800 text-sm flex items-center"
                             >
                                 Lihat Kalender{" "}
@@ -448,44 +494,55 @@ export default function Dashboard() {
                             </Link>
                         </div>
 
-                        {dummyData.upcomingPayments.map((payment) => (
-                            <div
-                                key={payment.id}
-                                className="bg-gray-50 rounded-lg p-4 mb-3 last:mb-0"
-                            >
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="text-sm font-medium text-gray-900">
-                                        {payment.name}
-                                    </h3>
-                                    <span
-                                        className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                            priorityColors[
-                                                payment.priority as keyof typeof priorityColors
-                                            ]
-                                        }`}
-                                    >
-                                        {payment.priority === "high"
-                                            ? "Penting"
-                                            : payment.priority === "medium"
-                                            ? "Sedang"
-                                            : "Rendah"}
-                                    </span>
+                        {dashboardData.upcomingPayments &&
+                        dashboardData.upcomingPayments.length > 0 ? (
+                            dashboardData.upcomingPayments.map((payment) => (
+                                <div
+                                    key={payment.id}
+                                    className="bg-gray-50 rounded-lg p-4 mb-3 last:mb-0"
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="text-sm font-medium text-gray-900">
+                                            {payment.name}
+                                        </h3>
+                                        <span
+                                            className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                                priorityColors[
+                                                    payment.priority as keyof typeof priorityColors
+                                                ]
+                                            }`}
+                                        >
+                                            {payment.priority === "high"
+                                                ? "Penting"
+                                                : payment.priority === "medium"
+                                                ? "Sedang"
+                                                : "Rendah"}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-500 flex items-center">
+                                            <Calendar className="w-3.5 h-3.5 mr-1" />{" "}
+                                            {payment.date}
+                                        </span>
+                                        <span className="font-medium text-gray-900">
+                                            {formatCurrency(payment.amount)}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-500 flex items-center">
-                                        <Calendar className="w-3.5 h-3.5 mr-1" />{" "}
-                                        {payment.date}
-                                    </span>
-                                    <span className="font-medium text-gray-900">
-                                        {formatCurrency(payment.amount)}
-                                    </span>
-                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-6 text-gray-500">
+                                Tidak ada pembayaran yang akan datang.
                             </div>
-                        ))}
+                        )}
 
-                        <button className="w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium py-2.5 px-4 rounded-lg mt-3 transition-colors text-sm">
-                            + Tambah Pengingat Pembayaran
-                        </button>
+                        <Link
+                            href={route("budgetPlans.create")}
+                            className="w-full bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium py-2.5 px-4 rounded-lg mt-3 transition-colors text-sm flex items-center justify-center"
+                        >
+                            <PlusCircle className="w-4 h-4 mr-2" />
+                            Tambah Pengingat Pembayaran
+                        </Link>
                     </div>
 
                     {/* Quick Actions */}
@@ -496,7 +553,7 @@ export default function Dashboard() {
 
                         <div className="grid grid-cols-3 gap-3">
                             <Link
-                                href=""
+                                href={route("userWallets.index")}
                                 className="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                                 <div className="p-2 rounded-lg bg-blue-100 mb-2">
@@ -511,7 +568,7 @@ export default function Dashboard() {
                             </Link>
 
                             <Link
-                                href=""
+                                href={route("budgetPlans.index")}
                                 className="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                                 <div className="p-2 rounded-lg bg-green-100 mb-2">
@@ -526,7 +583,7 @@ export default function Dashboard() {
                             </Link>
 
                             <Link
-                                href=""
+                                href={route("splitBills.index")}
                                 className="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                                 <div className="p-2 rounded-lg bg-purple-100 mb-2">
@@ -541,7 +598,7 @@ export default function Dashboard() {
                             </Link>
 
                             <Link
-                                href=""
+                                href={route("transactions.index")}
                                 className="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                                 <div className="p-2 rounded-lg bg-yellow-100 mb-2">
@@ -551,27 +608,12 @@ export default function Dashboard() {
                                     />
                                 </div>
                                 <span className="text-xs font-medium text-gray-700">
-                                    Laporan
+                                    Transaksi
                                 </span>
                             </Link>
 
                             <Link
-                                href=""
-                                className="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                            >
-                                <div className="p-2 rounded-lg bg-indigo-100 mb-2">
-                                    <TrendingUp
-                                        size={20}
-                                        className="text-indigo-600"
-                                    />
-                                </div>
-                                <span className="text-xs font-medium text-gray-700">
-                                    Target
-                                </span>
-                            </Link>
-
-                            <Link
-                                href=""
+                                href={route("profile.edit")}
                                 className="flex flex-col items-center justify-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                                 <div className="p-2 rounded-lg bg-gray-100 mb-2">

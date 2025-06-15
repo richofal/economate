@@ -41,6 +41,76 @@ export interface UserWallet {
     transactions?: Transaction[];
 }
 
+export interface Transaction {
+    id: number;
+    user_wallet_id: number;
+    type: string;
+    amount: string;
+    description?: string | null;
+    date: string;
+    created_at?: string;
+    updated_at?: string;
+    userWallet?: UserWallet;
+}
+
+export interface SplitBill {
+    id: number;
+    user: User;
+    total_amount: string;
+    title: string;
+    created_at?: string;
+    updated_at?: string;
+    items?: SplitBillItem[];
+    participants?: SplitBillParticipant[];
+}
+
+export interface SplitBillParticipant {
+    id: number;
+    split_bill_id: number;
+    name: string;
+    amount_owed;
+    created_at?: string;
+    updated_at?: string;
+    split_bill?: SplitBill;
+}
+
+export interface SplitBillItem {
+    id: number;
+    split_bill_id: number;
+    name: string;
+    price: string;
+    quantity: number;
+    created_at?: string;
+    updated_at?: string;
+    split_bill?: SplitBill;
+}
+
+export interface BudgetPlan {
+    id: number;
+    user_id: number;
+    name: string;
+    description?: string | null;
+    start_date: string;
+    end_date: string;
+    total_budget: string;
+    created_at?: string;
+    updated_at?: string;
+    user?: User;
+    budget_items?: BudgetItem[];
+}
+
+export interface BudgetItem {
+    id: number;
+    budget_plan_id: number;
+    name: string;
+    amount: string;
+    description?: string | null;
+    status: string;
+    created_at?: string;
+    updated_at?: string;
+    budgetPlan?: BudgetPlan;
+}
+
 export type PaginatedData<T> = {
     data: T[];
     links: {

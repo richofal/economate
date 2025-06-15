@@ -23,7 +23,7 @@ export default function GuestLayout({
     // Update document title if provided
     useEffect(() => {
         if (pageTitle) {
-            document.title = `${pageTitle} | PT. Smart CRM`;
+            document.title = `${pageTitle} | PT. EconoMate CRM`;
         }
     }, [pageTitle]);
 

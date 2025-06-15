@@ -1,22 +1,23 @@
 <?php
 
-
+use App\Http\Controllers\BudgetItemController;
+use App\Http\Controllers\BudgetPlanController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SplitBillController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserWalletController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
-use Inertia\Inertia;
+use App\Http\Controllers\TransactionController;
 
 Route::controller(PageController::class)->group(function () {
     Route::get('/', 'welcome')->name('welcome');
 });
 
 Route::prefix('dashboard')->middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Dashboard/Index');
-    })->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::prefix('profile')->controller(ProfileController::class)->group(function () {
         Route::get('/', 'index')->name('profile.index');
         Route::get('/edit', 'edit')->name('profile.edit');
@@ -34,8 +35,12 @@ Route::prefix('dashboard')->middleware(['auth', 'verified'])->group(function () 
         ->parameters([
             'my-wallets' => 'userWallet'
         ]);
+    Route::resource('transactions', TransactionController::class);
+    Route::resource('splitBills', SplitBillController::class);
+    Route::resource('budgetPlans', BudgetPlanController::class);
+    Route::resource('budgetPlans.budgetItems', BudgetItemController::class)
+        ->shallow()
+        ->only(['store', 'update', 'destroy']);
 });
-
-Route::middleware('auth')->group(function () {});
 
 require __DIR__ . '/auth.php';

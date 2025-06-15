@@ -41,7 +41,7 @@ const Hero: React.FC = () => {
                                     onClick={startLoading}
                                     className="bg-white text-[#089BFF] border-2 border-[#089BFF] text-lg md:text-xl font-medium py-3 px-8 rounded-full hover:bg-blue-50 transform hover:scale-105 transition duration-300"
                                 >
-                                    Lihat Fitur
+                                    Lihat Layanan
                                 </Link>
                             </div>
                         </section>

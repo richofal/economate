@@ -15,9 +15,9 @@ class Transaction extends Model
     protected $fillable = [
         'user_wallet_id',
         'amount',
-        'transaction_type',
-        'status',
+        'type',
         'description',
+        'date',
     ];
 
     protected $casts = [

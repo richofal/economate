@@ -8,11 +8,14 @@ import {
     ChevronDown,
     ChevronUp,
     LogOut,
-    User,
     Menu,
-    X,
+    PiggyBank,
+    Divide,
+    Receipt,
 } from "lucide-react";
 import DefaultUserImage from "@/Components/DefaultUserImage";
+import { PageProps } from "@/types";
+
 interface MenuItem {
     name: string;
     icon: React.ReactNode;
@@ -23,22 +26,26 @@ interface MenuItem {
     badgeCount?: number;
 }
 
-const Sidebar = () => {
+interface SidebarProps {
+    isSidebarOpen: boolean;
+}
+
+const Sidebar = ({ isSidebarOpen }: SidebarProps) => {
     const { url, props } = usePage();
     const { auth } = props;
-    const [showLogout, setShowLogout] = useState(false);
     const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     const isActive = (path: string) => {
         if (!path) return false;
-        if (route("dashboard") === path) {
-            return url === path;
-        }
-        return url.startsWith(path.split("?")[0]);
+        const currentPath = url.split("?")[0];
+        const routePath = path.split("?")[0];
+        if (route("dashboard") === routePath) return currentPath === routePath;
+        return currentPath.startsWith(routePath);
     };
 
-    // Menu item definitions with Lucide icons
+    console.log(auth.user);
+
     const menuItems: MenuItem[] = useMemo(
         () => [
             {
@@ -46,8 +53,6 @@ const Sidebar = () => {
                 name: "Dashboard",
                 icon: <Home size={18} />,
                 route: route("dashboard"),
-                permission: "view-dashboard",
-                
             },
             {
                 section: "Manajemen",
@@ -59,7 +64,6 @@ const Sidebar = () => {
                         name: "Daftar Pengguna",
                         icon: <Users size={16} />,
                         route: route("users.index"),
-                        permission: "view-any-users",
                     },
                 ],
             },
@@ -71,20 +75,38 @@ const Sidebar = () => {
                     {
                         name: "Dompet Sistem",
                         icon: <Wallet size={16} />,
-                        route: route("wallets.index"),
                         permission: "view-any-wallets",
+                        route: route("wallets.index"),
                     },
                     {
                         name: "Dompet Saya",
                         icon: <Wallet size={16} />,
                         route: route("userWallets.index"),
-                        permission: "view-any-user-wallets",
                     },
                 ],
             },
+            {
+                section: "Transaksi",
+                name: "Transaksi",
+                icon: <Receipt size={18} />,
+                route: route("transactions.index"),
+            },
+            {
+                section: "Split Bill",
+                name: "Split Bill",
+                icon: <Divide size={18} />,
+                route: route("splitBills.index"),
+            },
+            {
+                section: "Budget Plan",
+                name: "Budget Plan",
+                icon: <PiggyBank size={18} />,
+                route: route("budgetPlans.index"),
+            },
         ],
-        [url]
+        []
     );
+
     useEffect(() => {
         const activeParent = menuItems.find((item) =>
             item.children?.some((child) => child.route && isActive(child.route))
@@ -92,288 +114,280 @@ const Sidebar = () => {
         if (activeParent) {
             setOpenSubmenu(activeParent.name);
         }
-    }, [url, menuItems]);
+    }, [url]);
+
     const canViewMenuItem = (permission?: string) => {
         if (!permission) return true;
         return auth?.user?.permissions?.includes(permission) || false;
     };
-    const toggleSubmenu = (name: string, e: React.MouseEvent) => {
-        e.preventDefault(); // Prevent navigation when toggling submenu
-        setOpenSubmenu(openSubmenu === name ? null : name);
+
+    const toggleSubmenu = (name: string) => {
+        setOpenSubmenu((prev) => (prev === name ? null : name));
     };
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth >= 1024) {
-                setIsMobileSidebarOpen(false);
-            }
-        };
 
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
-    // Group menu items by section
     const groupedMenuItems = useMemo(() => {
         const groups: Record<string, MenuItem[]> = {};
-
         menuItems.forEach((item) => {
-            const section = item.section || "";
-            if (!groups[section]) {
-                groups[section] = [];
-            }
+            const section = item.section || "Default";
             if (canViewMenuItem(item.permission)) {
+                if (!groups[section]) groups[section] = [];
                 groups[section].push(item);
             }
         });
+        return Object.entries(groups).filter(([, items]) => items.length > 0);
+    }, [auth?.user?.permissions]);
 
-        // Filter out empty sections
-        return Object.fromEntries(
-            Object.entries(groups).filter(([_, items]) => items.length > 0)
-        );
-    }, [menuItems, auth?.user?.permissions]);
-
-    // Menu item component
-    const MenuItem = ({ item }: { item: MenuItem }) => {
-        const hasChildren = item.children && item.children.length > 0;
-        const isSubmenuOpen = openSubmenu === item.name;
-        const isItemActive = item.route
-            ? isActive(item.route)
-            : item.children?.some(
-                  (child) => child.route && isActive(child.route)
-              ) || false;
-
-        // Filter out children based on permissions
+    const MenuItemComponent = ({ item }: { item: MenuItem }) => {
         const visibleChildren = item.children?.filter((child) =>
             canViewMenuItem(child.permission)
         );
+        const hasChildren = visibleChildren && visibleChildren.length > 0;
+        const isSubmenuOpen = openSubmenu === item.name;
+        const isItemActive = hasChildren
+            ? visibleChildren.some(
+                  (child) => child.route && isActive(child.route)
+              )
+            : item.route
+            ? isActive(item.route)
+            : false;
 
-        // Don't render if no visible children
-        if (hasChildren && (!visibleChildren || visibleChildren.length === 0)) {
-            return null;
-        }
+        if (hasChildren && !visibleChildren.length) return null;
+
+        const itemTextClasses = `transition-opacity duration-200 whitespace-nowrap ${
+            isSidebarOpen
+                ? "opacity-100"
+                : "opacity-0 pointer-events-none absolute"
+        }`;
 
         return (
             <li className="mb-1">
                 {hasChildren ? (
-                    <div className="mb-1">
-                        {/* Use div instead of button to prevent form submission */}
-                        <div
-                            onClick={(e) => toggleSubmenu(item.name, e)}
-                            className={`w-full flex items-center justify-between py-2 px-3 rounded-md transition-all duration-200 cursor-pointer ${
+                    <div>
+                        <button
+                            onClick={() => toggleSubmenu(item.name)}
+                            type="button"
+                            className={`w-full flex items-center justify-between py-2 px-3 rounded-md transition-colors ${
                                 isItemActive
-                                    ? "bg-white/15 text-yellow-200 font-medium"
-                                    : "text-white hover:bg-white/10"
+                                    ? "bg-white/15 text-white font-medium"
+                                    : "text-white/90 hover:bg-white/10"
                             }`}
                         >
-                            <div className="flex items-center">
-                                <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center mr-3">
+                            <div className="flex items-center overflow-hidden">
+                                <span className="w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">
                                     {item.icon}
                                 </span>
-                                <span>{item.name}</span>
+                                <span className={itemTextClasses}>
+                                    {item.name}
+                                </span>
                             </div>
-                            <span className="flex-shrink-0">
+                            <span className={itemTextClasses}>
                                 {isSubmenuOpen ? (
                                     <ChevronUp size={16} />
                                 ) : (
                                     <ChevronDown size={16} />
                                 )}
                             </span>
-                        </div>
-
+                        </button>
                         <AnimatePresence>
-                            {isSubmenuOpen &&
-                                visibleChildren &&
-                                visibleChildren.length > 0 && (
-                                    <motion.ul
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: "auto", opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.2 }}
-                                        className="ml-4 mt-1 overflow-hidden border-l border-white/20"
-                                    >
-                                        {visibleChildren.map((child) => (
-                                            <li
-                                                key={child.name}
-                                                className="my-1 pl-2"
+                            {isSubmenuOpen && isSidebarOpen && (
+                                <motion.ul
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="ml-5 mt-1 overflow-hidden border-l border-white/20"
+                                >
+                                    {visibleChildren.map((child) => (
+                                        <li
+                                            key={child.name}
+                                            className="my-1 pl-2"
+                                        >
+                                            <Link
+                                                href={child.route || "#"}
+                                                className={`flex items-center py-2 px-3 rounded-md text-sm transition-colors ${
+                                                    child.route &&
+                                                    isActive(child.route)
+                                                        ? "bg-white/10 text-white font-medium"
+                                                        : "text-white/80 hover:bg-white/5"
+                                                }`}
                                             >
-                                                <Link
-                                                    href={child.route || "#"}
-                                                    className={`flex items-center py-2 px-3 rounded-md transition-all text-sm ${
-                                                        child.route &&
-                                                        isActive(child.route)
-                                                            ? "bg-white/10 text-yellow-200 font-medium"
-                                                            : "text-white/90 hover:bg-white/5 hover:text-white"
-                                                    }`}
-                                                    preserveScroll
-                                                >
-                                                    <span className="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-2">
-                                                        {child.icon}
-                                                    </span>
-                                                    <span>{child.name}</span>
-                                                    {child.badgeCount && (
-                                                        <span className="ml-auto bg-yellow-500 text-xs font-medium text-white px-1.5 py-0.5 rounded-full">
-                                                            {child.badgeCount}
-                                                        </span>
-                                                    )}
-                                                </Link>
-                                            </li>
-                                        ))}
-                                    </motion.ul>
-                                )}
+                                                <span className="w-5 h-5 flex items-center justify-center mr-2 flex-shrink-0">
+                                                    {child.icon}
+                                                </span>
+                                                <span className="flex-1">
+                                                    {child.name}
+                                                </span>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </motion.ul>
+                            )}
                         </AnimatePresence>
                     </div>
                 ) : (
                     <Link
                         href={item.route || "#"}
-                        className={`flex items-center py-2 px-3 rounded-md transition-all duration-200 ${
-                            item.route && isActive(item.route)
-                                ? "bg-white/15 text-yellow-200 font-medium"
-                                : "text-white hover:bg-white/10"
+                        className={`flex items-center py-2 px-3 rounded-md transition-colors ${
+                            isItemActive
+                                ? "bg-white/15 text-white font-medium"
+                                : "text-white/90 hover:bg-white/10"
                         }`}
-                        preserveScroll
                     >
-                        <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center mr-3">
+                        <span className="w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0">
                             {item.icon}
                         </span>
-                        <span>{item.name}</span>
-                        {item.badgeCount && (
-                            <span className="ml-auto bg-yellow-500 text-xs font-medium text-white px-1.5 py-0.5 rounded-full">
-                                {item.badgeCount}
-                            </span>
-                        )}
+                        <span className={itemTextClasses}>{item.name}</span>
                     </Link>
                 )}
             </li>
         );
     };
 
-    // Mobile menu toggle
-    const MobileMenuToggle = () => (
-        <button
-            onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-            className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md shadow-lg"
-            aria-label="Toggle menu"
+    const SidebarContent = () => (
+        <motion.div
+            initial={false}
+            animate={{ width: isSidebarOpen ? "16rem" : "5rem" }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="h-screen flex flex-col bg-gradient-to-b from-[#089BFF] to-[#0470b8] shadow-lg overflow-hidden"
         >
-            {isMobileSidebarOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-    );
-
-    // Main sidebar component
-    return (
-        <>
-            <MobileMenuToggle />
-
-            <aside
-                className={`fixed inset-y-0 left-0 z-40 transform lg:translate-x-0 transition-transform duration-300 ease-in-out lg:relative
-                    ${
-                        isMobileSidebarOpen
-                            ? "translate-x-0"
-                            : "-translate-x-full"
-                    }
-                    lg:block w-64 bg-gradient-to-b from-[#089BFF] to-[#0470b8] h-screen flex flex-col shadow-lg`}
-            >
-                {/* Logo */}
-                <div className="flex justify-center p-4 mb-2 flex-shrink-0">
-                    <Link href={route("dashboard")} preserveScroll>
-                        <img
-                            alt="EconoMate Logo"
-                            className="cursor-pointer w-[160px] h-auto transition-transform hover:scale-105"
-                            src="/images/logo.png"
-                        />
+            <div className="flex-shrink-0">
+                <div className="flex p-4 h-16 items-center justify-center">
+                    <Link href={route("dashboard")}>
+                        <AnimatePresence mode="wait">
+                            <motion.img
+                                key={isSidebarOpen ? "logo" : "icon"}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 10 }}
+                                transition={{ duration: 0.2 }}
+                                alt={
+                                    isSidebarOpen
+                                        ? "EconoMate Logo"
+                                        : "EconoMate Icon"
+                                }
+                                className="cursor-pointer"
+                                src={
+                                    isSidebarOpen
+                                        ? "/images/logo.png"
+                                        : "/images/icon.png"
+                                }
+                                style={{
+                                    height: isSidebarOpen ? "auto" : "2rem",
+                                    width: isSidebarOpen ? "10rem" : "auto",
+                                }}
+                            />
+                        </AnimatePresence>
                     </Link>
                 </div>
-
-                {/* Navigation Menu - Now a fixed height with scroll */}
-                <nav className="flex-1 overflow-y-auto px-4 pb-4 hide-scrollbar">
-                    {Object.entries(groupedMenuItems).map(
-                        ([section, items]) => (
-                            <div key={section || "default"} className="mb-6">
-                                {section && (
-                                    <h2 className="flex items-center text-sm uppercase tracking-wider font-bold text-white/70 px-3 mb-2">
-                                        {section}
-                                    </h2>
-                                )}
-                                <ul className="space-y-1">
-                                    {items.map((item) => (
-                                        <MenuItem key={item.name} item={item} />
-                                    ))}
-                                </ul>
-                            </div>
-                        )
-                    )}
-                </nav>
-
-                <div className="px-4 pb-4 pt-2 border-t border-white/20 flex-shrink-0">
+                <div className="px-4 py-3 border-y border-white/20">
                     <div
-                        className="flex items-center p-2 rounded-lg cursor-pointer hover:bg-white/10 transition-colors"
-                        onClick={() => setShowLogout(!showLogout)}
+                        className={`flex items-center ${
+                            !isSidebarOpen && "justify-center"
+                        }`}
                     >
-                        <div className="w-10 h-10 rounded-full overflow-hidden bg-white/20 flex-shrink-0">
-                            {auth?.user?.image ? (
-                                <img
-                                    src={auth.user.image}
-                                    alt={auth.user.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <DefaultUserImage
-                                    name={auth?.user?.name || "User"}
-                                />
-                            )}
-                        </div>
-                        <div className="ml-3 flex-grow overflow-hidden">
+                        <Link
+                            href={route("profile.index")}
+                            className="w-10 h-10 rounded-full overflow-hidden bg-white/20 flex-shrink-0"
+                        >
+                            <DefaultUserImage user={auth.user} />
+                        </Link>
+                        <div
+                            className={`ml-3 flex-grow overflow-hidden transition-all duration-300 ${
+                                isSidebarOpen
+                                    ? "opacity-100 max-w-full"
+                                    : "opacity-0 max-w-0"
+                            }`}
+                        >
                             <p className="text-white font-medium text-sm truncate">
-                                {auth?.user?.name || "User"}
+                                {auth.user.name}
                             </p>
                             <p className="text-white/70 text-xs truncate">
-                                {auth?.user?.email || "user@example.com"}
+                                {auth.user.email}
                             </p>
                         </div>
-                        {showLogout ? (
-                            <ChevronUp className="h-4 w-4 text-white/70" />
-                        ) : (
-                            <ChevronDown className="h-4 w-4 text-white/70" />
-                        )}
                     </div>
-
-                    <AnimatePresence>
-                        {showLogout && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="mt-2 bg-white rounded-lg shadow-lg overflow-hidden"
-                            >
-                                <Link
-                                    href=""
-                                    className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100 transition-colors"
-                                    preserveScroll
-                                >
-                                    <User size={16} className="mr-2" />
-                                    <span>Profil</span>
-                                </Link>
-                                <Link
-                                    href={route("logout")}
-                                    method="post"
-                                    as="button"
-                                    className="flex items-center w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition-colors border-t border-gray-100"
-                                >
-                                    <LogOut size={16} className="mr-2" />
-                                    <span>Keluar</span>
-                                </Link>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
                 </div>
-            </aside>
+            </div>
+            <nav className="flex-1 overflow-y-auto px-2 pb-4 custom-scrollbar">
+                {groupedMenuItems.map(([section, items]) => (
+                    <div key={section} className="mb-2">
+                        {isSidebarOpen && (
+                            <h2 className="px-3 mb-2 mt-4 text-xs uppercase font-bold text-white/60 tracking-wider">
+                                {section}
+                            </h2>
+                        )}
+                        <ul className="space-y-1">
+                            {items.map((item) => (
+                                <MenuItemComponent
+                                    key={item.name}
+                                    item={item}
+                                />
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </nav>
+            <div className={`p-4 border-t border-white/20 flex-shrink-0`}>
+                <Link
+                    href={route("logout")}
+                    method="post"
+                    as="button"
+                    className={`flex items-center justify-center w-full py-2 px-4 bg-red-600/90 hover:bg-red-700 text-white rounded-md transition-colors`}
+                >
+                    <LogOut
+                        size={16}
+                        className={isSidebarOpen ? "mr-2" : "mr-0"}
+                    />
+                    <span
+                        className={`font-medium text-sm whitespace-nowrap ${
+                            isSidebarOpen
+                                ? "opacity-100"
+                                : "opacity-0 pointer-events-none"
+                        }`}
+                    >
+                        Keluar
+                    </span>
+                </Link>
+            </div>
+        </motion.div>
+    );
 
-            {/* Backdrop overlay for mobile */}
-            {isMobileSidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-                    onClick={() => setIsMobileSidebarOpen(false)}
-                />
-            )}
+    return (
+        <>
+            <div className="lg:hidden">
+                <button
+                    onClick={() => setIsMobileSidebarOpen(true)}
+                    className="fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md shadow-lg"
+                >
+                    <Menu size={24} />
+                </button>
+                <AnimatePresence>
+                    {isMobileSidebarOpen && (
+                        <>
+                            <motion.div
+                                initial={{ x: "-100%" }}
+                                animate={{ x: 0 }}
+                                exit={{ x: "-100%" }}
+                                transition={{ type: "tween", duration: 0.3 }}
+                                className="fixed inset-y-0 left-0 z-40"
+                            >
+                                <SidebarContent />
+                            </motion.div>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="fixed inset-0 bg-black/50 z-30"
+                                onClick={() => setIsMobileSidebarOpen(false)}
+                            />
+                        </>
+                    )}
+                </AnimatePresence>
+            </div>
+            <div className="hidden lg:block flex-shrink-0">
+                <SidebarContent />
+            </div>
         </>
     );
 };

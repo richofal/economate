@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 2);
             $table->enum('type', ['credit', 'debit']);
             $table->string('description')->nullable();
+            $table->date('date');
             $table->timestamps();
         });
     }

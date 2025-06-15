@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('wallet_id')->constrained()->onDelete('cascade');
             $table->decimal('balance', 15, 2)->default(0.00);
+            $table->unique(['user_id', 'wallet_id'], 'user_wallet_unique');
             $table->timestamps();
         });
     }

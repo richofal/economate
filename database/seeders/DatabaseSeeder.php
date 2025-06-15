@@ -36,5 +36,10 @@ class DatabaseSeeder extends Seeder
             'phone' => '987-654-3210',
         ]);
         $user->assignRole('user');
+
+        $this->call([
+            WalletSeeder::class,
+            UserWalletTransactionSeeder::class,
+        ]);
     }
 }

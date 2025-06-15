@@ -23,7 +23,7 @@ import React from "react";
 
 // Tipe props halaman
 interface ProfilePageProps extends PageProps {
-    user: User; // 'user' sekarang memiliki 'roles' sebagai string[]
+    user: User;
 }
 
 // Komponen kecil untuk menampilkan satu item informasi
@@ -57,7 +57,6 @@ const Badge = ({ text, className }: { text: string; className?: string }) => (
 export default function ProfileIndex() {
     const { user } = usePage<ProfilePageProps>().props;
 
-    // Fungsi untuk mendapatkan kelas badge status
     const getStatusBadgeClasses = (status: string) => {
         switch (status) {
             case "active":
@@ -76,15 +75,15 @@ export default function ProfileIndex() {
     const getGenderInfo = (gender?: string) => {
         if (gender === "male")
             return (
-                <>
+                <div className="flex items-center justify-end">
                     <Mars className="h-4 w-4 mr-1.5 text-blue-500" /> Laki-laki
-                </>
+                </div>
             );
         if (gender === "female")
             return (
-                <>
+                <div className="flex items-center justify-end">
                     <Venus className="h-4 w-4 mr-1.5 text-pink-500" /> Perempuan
-                </>
+                </div>
             );
         return "-";
     };
@@ -92,18 +91,18 @@ export default function ProfileIndex() {
     return (
         <AuthenticatedLayout title="Profil Saya">
             <Head title="Profil Saya" />
-            <div className="max-7-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="bg-white overflow-hidden shadow-lg rounded-xl">
-                    {/* Header */}
                     <div className="relative">
                         <div className="h-40 bg-gradient-to-r from-blue-500 to-cyan-400" />
                         <div className="absolute left-1/2 -translate-x-1/2 -bottom-16">
-                            <div className="h-32 w-32 rounded-full ring-4 ring-white bg-gray-200 flex items-center justify-center">
+                            <div className="h-32 w-32 rounded-full ring-4 ring-white bg-gray-200 flex items-center justify-center overflow-hidden">
                                 {user.image ? (
                                     <img
-                                        src={user.image}
+                                        // [PERBAIKAN] Tambahkan `/` di depan untuk membuat path absolut
+                                        src={`/storage/${user.image}`}
                                         alt={user.name}
-                                        className="h-full w-full rounded-full object-cover"
+                                        className="h-full w-full object-cover"
                                     />
                                 ) : (
                                     <UserCircle className="h-24 w-24 text-gray-400" />
@@ -112,13 +111,11 @@ export default function ProfileIndex() {
                         </div>
                     </div>
 
-                    {/* Info Utama & Tombol Edit */}
                     <div className="pt-20 pb-6 text-center border-b border-gray-200">
                         <h1 className="text-3xl font-bold text-gray-900">
                             {user.name}
                         </h1>
                         <p className="text-md text-blue-600 font-semibold mt-1">
-                            {/* SEKARANG INI AKAN BEKERJA KARENA user.roles ADALAH ARRAY STRING */}
                             {user.roles && user.roles.length > 0
                                 ? user.roles.join(" / ")
                                 : "User"}
@@ -140,10 +137,8 @@ export default function ProfileIndex() {
                         </div>
                     </div>
 
-                    {/* Detail Informasi */}
                     <div className="p-6">
                         <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                            {/* Kolom Kiri */}
                             <div>
                                 <h3 className="font-semibold text-gray-800 mb-2">
                                     Informasi Pribadi
@@ -190,7 +185,6 @@ export default function ProfileIndex() {
                                 />
                             </div>
 
-                            {/* Kolom Kanan */}
                             <div>
                                 <h3 className="font-semibold text-gray-800 mb-2">
                                     Informasi Akun
@@ -251,7 +245,6 @@ export default function ProfileIndex() {
                                 />
                             </div>
 
-                            {/* Roles & Permissions (jika perlu) */}
                             <div className="md:col-span-2 pt-4">
                                 <h3 className="font-semibold text-gray-800 mb-2">
                                     Peran & Izin

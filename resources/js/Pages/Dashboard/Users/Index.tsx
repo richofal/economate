@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import DefaultUserImage from "@/Components/DefaultUserImage";
+import EmptyState from "@/Components/EmptyState";
 
 interface UsersIndexPageProps extends PageProps {
     users: User[];
@@ -382,32 +383,27 @@ const UsersIndex = () => {
                             animate={{ opacity: 1 }}
                             className="text-center py-12"
                         >
-                            <div className="flex justify-center">
-                                <UserIcon className="h-16 w-16 text-gray-300" />
-                            </div>
-                            <h3 className="mt-4 text-lg font-medium text-gray-900">
-                                Tidak ada pengguna ditemukan
-                            </h3>
-                            <p className="mt-1 text-gray-500">
-                                {searchTerm || statusFilter || roleFilter
-                                    ? "Coba ubah filter pencarian Anda"
-                                    : "Buat pengguna baru untuk mulai mengelola sistem Anda"}
-                            </p>
-
-                            {(searchTerm || statusFilter || roleFilter) && (
-                                <button
-                                    onClick={resetFilters}
-                                    className="mt-4 inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 font-medium rounded-lg transition-colors text-sm"
-                                >
-                                    Reset Semua Filter
-                                </button>
-                            )}
-
-                            {auth.user?.permissions?.includes("create-users") &&
-                                !searchTerm &&
-                                !statusFilter &&
-                                !roleFilter && (
-                                    <div className="mt-6">
+                            <EmptyState
+                                title="Tidak ada pengguna ditemukan"
+                                description={
+                                    searchTerm || statusFilter || roleFilter
+                                        ? "Coba ubah filter pencarian Anda"
+                                        : "Buat pengguna baru untuk mulai mengelola sistem Anda"
+                                }
+                                icon={
+                                    <UserIcon className="h-6 w-6 text-gray-400" />
+                                }
+                                action={
+                                    searchTerm || statusFilter || roleFilter ? (
+                                        <button
+                                            onClick={resetFilters}
+                                            className="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 font-medium rounded-lg transition-colors text-sm"
+                                        >
+                                            Reset Semua Filter
+                                        </button>
+                                    ) : auth.user?.permissions?.includes(
+                                          "create-users"
+                                      ) ? (
                                         <Link
                                             href={route("users.create")}
                                             className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm"
@@ -415,8 +411,9 @@ const UsersIndex = () => {
                                             <Plus className="w-5 h-5 mr-2" />
                                             Tambah Pengguna Baru
                                         </Link>
-                                    </div>
-                                )}
+                                    ) : null
+                                }
+                            />
                         </motion.div>
                     ) : (
                         <motion.div

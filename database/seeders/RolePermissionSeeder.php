@@ -21,6 +21,7 @@ class RolePermissionSeeder extends Seeder
             'users',
             'user-wallets',
             'transactions',
+            'split-bills',
             'budget-plans'
         ];
 
@@ -54,6 +55,11 @@ class RolePermissionSeeder extends Seeder
             'create-transactions',
             'update-transactions',
             'delete-transactions',
+            'view-any-split-bills',
+            'view-split-bills',
+            'create-split-bills',
+            'update-split-bills',
+            'delete-split-bills',
             'view-any-budget-plans',
             'view-budget-plans',
             'create-budget-plans',

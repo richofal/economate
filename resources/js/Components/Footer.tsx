@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
                                 <img
                                     alt="EconoMate Logo"
                                     className="w-[200px] h-auto pt-5 lg:py-0"
-                                    src="/logo.png"
+                                    src="/images/logo.png"
                                 />
                             </Link>
                         </div>
@@ -40,7 +40,7 @@ const Footer: React.FC = () => {
                                     >
                                         <img
                                             alt="Facebook"
-                                            src="/fb.png"
+                                            src="/images/fb.png"
                                             width="20"
                                             height="20"
                                             className="mr-2 md:w-6"
@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
                                     >
                                         <img
                                             alt="Instagram"
-                                            src="/ig.png"
+                                            src="/images/ig.png"
                                             width="20"
                                             height="20"
                                             className="mr-2 md:w-6"
@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
                                     >
                                         <img
                                             alt="Phone"
-                                            src="/call.png"
+                                            src="/images/call.png"
                                             width="20"
                                             height="20"
                                             className="mr-2 md:w-6"
@@ -103,7 +103,7 @@ const Footer: React.FC = () => {
                                     >
                                         <img
                                             alt="Phone"
-                                            src="/call.png"
+                                            src="/images/call.png"
                                             width="20"
                                             height="20"
                                             className="mr-2 md:w-6"
@@ -116,7 +116,7 @@ const Footer: React.FC = () => {
                                 <div className="flex items-center justify-center lg:justify-start mt-2">
                                     <img
                                         alt="Email"
-                                        src="/email.png"
+                                        src="/images/email.png"
                                         width="20"
                                         height="20"
                                         className="mr-2 md:w-6"
@@ -140,7 +140,7 @@ const Footer: React.FC = () => {
                     <div className="flex flex-col items-center space-y-4">
                         <img
                             alt="Logo EconoMate"
-                            src="/logo.png"
+                            src="/images/logo.png"
                             className="w-[200px] h-auto"
                         />
                         <div className="w-12 h-12 rounded-full border-4 border-white border-t-transparent animate-spin"></div>

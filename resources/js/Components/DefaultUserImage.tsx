@@ -1,16 +1,19 @@
-import React from "react";
+import { User } from "@/types";
 
 interface DefaultUserImageProps {
-    name: string;
+    user: User;
     className?: string;
 }
 
-const DefaultUserImage = ({ name, className = "" }: DefaultUserImageProps) => {
+const DefaultUserImage = ({ user, className = "" }: DefaultUserImageProps) => {
+    // Check if user has an image
+    const hasImage = user.image && user.image.length > 0;
+
     // Get initials from name
-    const initials = name
+    const initials = user.name
         .split(" ")
         .slice(0, 2)
-        .map((part) => part[0])
+        .map((part) => part?.[0] || "")
         .join("")
         .toUpperCase();
 
@@ -35,7 +38,17 @@ const DefaultUserImage = ({ name, className = "" }: DefaultUserImageProps) => {
         return colors[index];
     };
 
-    const colorClass = generateColor(name);
+    const colorClass = generateColor(user.name);
+
+    if (hasImage) {
+        return (
+            <img
+                src={`/storage/${user.image}`}
+                alt={user.name}
+                className={`w-full h-full object-cover ${className}`}
+            />
+        );
+    }
 
     return (
         <div

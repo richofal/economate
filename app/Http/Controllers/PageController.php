@@ -26,67 +26,8 @@ class PageController extends Controller
         return Inertia::render('About/Index');
     }
 
-    public function products()
+    public function services()
     {
-        // Load products with eager loading for related data
-        $products = Product::with([
-            'productPrices',  // Pastikan ini sesuai dengan nama relasi di model Product
-            'category',
-        ])
-            ->where('is_active', true)  // Hanya tampilkan produk aktif
-            ->orderBy('is_featured', 'desc')  // Tampilkan produk unggulan lebih dulu
-            ->get();
-
-        $categories = Category::select(['id', 'name'])
-            ->whereHas('products', function ($query) {
-                $query->where('is_active', true);
-            })
-            ->orderBy('name')
-            ->get();
-
-        return Inertia::render(
-            'Products/Index',
-            [
-                'products' => $products,
-                'categories' => $categories,
-            ]
-        );
-    }
-
-    public function product(String $slug)
-    {
-        // Find the product by its code (slug)
-        $product = Product::where('code', $slug)
-            ->where('is_active', true)
-            ->with([
-                'category',
-                'productPrices'
-            ])
-            ->firstOrFail();
-
-
-        // Get related products in the same category
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $product->id)
-            ->where('is_active', true)
-            ->with(['productPrices'])
-            ->orderBy('is_featured', 'desc')
-            ->limit(3)
-            ->get();
-
-        // Get a list of popular products (could be based on views or other metrics)
-        $popularProducts = Product::where('is_active', true)
-            ->where('is_featured', true)
-            ->where('id', '!=', $product->id)
-            ->with(['productPrices'])
-            ->inRandomOrder()
-            ->limit(2)
-            ->get();
-
-        return Inertia::render('Products/Show', [
-            'product' => $product,
-            'relatedProducts' => $relatedProducts,
-            'popularProducts' => $popularProducts,
-        ]);
+        return Inertia::render('Services/Index');
     }
 }

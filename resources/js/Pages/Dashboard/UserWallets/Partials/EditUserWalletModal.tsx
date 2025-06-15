@@ -2,7 +2,7 @@ import { Fragment, useEffect } from "react";
 import { useForm } from "@inertiajs/react";
 import { Dialog, Transition } from "@headlessui/react";
 import { UserWallet } from "@/types";
-import { X, Save, Loader } from "lucide-react";
+import { X } from "lucide-react";
 
 interface EditModalProps {
     isOpen: boolean;
