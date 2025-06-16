@@ -44,8 +44,6 @@ const Sidebar = ({ isSidebarOpen }: SidebarProps) => {
         return currentPath.startsWith(routePath);
     };
 
-    console.log(auth.user);
-
     const menuItems: MenuItem[] = useMemo(
         () => [
             {

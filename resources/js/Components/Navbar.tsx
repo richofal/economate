@@ -22,8 +22,6 @@ const Navbar: React.FC = () => {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const { auth } = usePage().props;
 
-    console.log(auth.user);
-
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const section = params.get("section");

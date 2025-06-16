@@ -96,8 +96,6 @@ const IncomeExpenseChart = ({
         }
     };
 
-    console.log("Data awal:", data);
-
     useEffect(() => {
         if (data) {
             setLoading(true);
