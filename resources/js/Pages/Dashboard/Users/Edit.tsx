@@ -105,17 +105,9 @@ const UsersEdit = () => {
                     Kembali ke Daftar Pengguna
                 </Link>
                 <div className="flex items-center gap-3">
-                    {user.image ? (
-                        <img
-                            src={user.image}
-                            alt={user.name}
-                            className="h-12 w-12 rounded-full object-cover border border-gray-200"
-                        />
-                    ) : (
-                        <div className="h-12 w-12 rounded-full border border-gray-200">
-                            <DefaultUserImage name={user.name} />
-                        </div>
-                    )}
+                    <div className="h-12 w-12 rounded-full border border-gray-200">
+                        <DefaultUserImage user={user} />
+                    </div>
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">
                             Edit Pengguna: {user.name}

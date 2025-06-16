@@ -108,18 +108,10 @@ const UsersShow = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div className="flex items-center gap-4">
                         <div className="h-16 w-16 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
-                            {user.image ? (
-                                <img
-                                    src={user.image}
-                                    alt={user.name}
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <DefaultUserImage
-                                    name={user.name}
-                                    className="w-full h-full"
-                                />
-                            )}
+                            <DefaultUserImage
+                                user={user}
+                                className="w-full h-full"
+                            />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">
