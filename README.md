@@ -108,12 +108,12 @@ EconoMate is a comprehensive personal finance management system built with Larav
 
 ### Admin Account:
 
--   **Email**: `admin@example.com`
+-   **Email**: `admin@admin.com`
 -   **Password**: `password`
 
 ### User Account:
 
--   **Email**: `user@example.com`
+-   **Email**: `user@user.com`
 -   **Password**: `password`
 
 ---

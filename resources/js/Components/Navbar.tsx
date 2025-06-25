@@ -71,7 +71,7 @@ const Navbar: React.FC = () => {
             <nav
                 className={`flex items-center justify-between py-3 px-4 md:px-8 w-full fixed top-0 left-0 z-50 transition-all duration-300 ${
                     isScrolled
-                        ? "bg-white shadow-md"
+                        ? "bg-[#0C1319] shadow-md"
                         : "bg-gradient-to-r from-[#089BFF] to-[#0081d6]"
                 }`}
             >
@@ -115,7 +115,7 @@ const Navbar: React.FC = () => {
                             isScrolled
                                 ? isActive("/layanan")
                                     ? "text-[#089BFF] font-bold"
-                                    : "text-gray-700"
+                                    : "text-[#089BFF]"
                                 : "text-white"
                         }`}
                         onClick={(e) => scrollToSection("layanan-section", e)}
@@ -279,7 +279,7 @@ const Navbar: React.FC = () => {
                 <div className="md:hidden flex items-center">
                     <button
                         onClick={toggleMenu}
-                        className={isScrolled ? "text-[#089BFF]" : "text-white"}
+                        className={isScrolled ? "text-white" : "text-white"}
                         aria-label="Toggle Menu"
                     >
                         {isMenuOpen ? (
@@ -326,142 +326,170 @@ const Navbar: React.FC = () => {
                     leaveFrom="opacity-100 scale-100"
                     leaveTo="opacity-0 scale-95"
                 >
-                    <div className="flex flex-col space-y-4 p-6">
-                        <Link
-                            href="/"
-                            className={`text-gray-800 text-lg py-3 border-b border-gray-100 ${
-                                isActive("/") ? "font-bold text-[#089BFF]" : ""
-                            }`}
-                            onClick={() => {
-                                toggleMenu();
-                                startLoading();
-                            }}
+                    <div className="fixed inset-0 z-50 bg-white overflow-y-auto flex flex-col p-6">
+                        {/* Tombol Close */}
+                        <button
+                            onClick={toggleMenu}
+                            className="absolute top-4 right-4 text-gray-800 hover:text-[#089BFF] transition-colors"
+                            aria-label="Tutup Menu"
+                            type="button"
                         >
-                            Home
-                        </Link>
-                        <a
-                            href="#layanan-section"
-                            className={`text-gray-800 text-lg py-3 border-b border-gray-100 ${
-                                isActive("/features")
-                                    ? "font-bold text-[#089BFF]"
-                                    : ""
-                            }`}
-                            onClick={(e) =>
-                                scrollToSection("layanan-section", e)
-                            }
-                        >
-                            Layanan
-                        </a>
-                        {auth?.user ? (
-                            <div className="border-t border-gray-100 pt-4 mt-2">
-                                <div className="flex items-center mb-4 space-x-3">
-                                    <div className="h-12 w-12 rounded-full overflow-hidden">
-                                        <DefaultUserImage user={auth.user} />
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                className="w-8 h-8"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                        <nav className="mt-10 flex flex-col space-y-4">
+                            <Link
+                                href="/"
+                                className={`text-gray-800 text-lg py-3 border-b border-gray-400 ${
+                                    isActive("/")
+                                        ? "font-bold text-[#089BFF]"
+                                        : ""
+                                }`}
+                                onClick={() => {
+                                    toggleMenu();
+                                    startLoading();
+                                }}
+                            >
+                                Home
+                            </Link>
+                            <a
+                                href="#layanan-section"
+                                className={`text-gray-800 text-lg py-3 border-b border-gray-400 ${
+                                    isActive("/features")
+                                        ? "font-bold text-[#089BFF]"
+                                        : ""
+                                }`}
+                                onClick={(e) => {
+                                    scrollToSection("layanan-section", e);
+                                }}
+                            >
+                                Layanan
+                            </a>
+                            {auth?.user ? (
+                                <div className="border-t border-gray-100 pt-4 mt-2">
+                                    <div className="flex items-center mb-4 space-x-3">
+                                        <div className="h-12 w-12 rounded-full overflow-hidden">
+                                            <DefaultUserImage
+                                                user={auth.user}
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium">
+                                                {auth.user.name}
+                                            </p>
+                                            <p className="text-sm text-gray-500">
+                                                {auth.user.email}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-medium">
-                                            {auth.user.name}
-                                        </p>
-                                        <p className="text-sm text-gray-500">
-                                            {auth.user.email}
-                                        </p>
-                                    </div>
+                                    <Link
+                                        href={route("profile.index")}
+                                        className="flex items-center text-gray-700 py-3 border-t border-gray-100"
+                                        onClick={() => {
+                                            toggleMenu();
+                                            startLoading();
+                                        }}
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-5 w-5 mr-2.5 text-gray-500"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                            />
+                                        </svg>
+                                        Profil Saya
+                                    </Link>
+                                    <Link
+                                        href={route("dashboard")}
+                                        className="flex items-center text-gray-700 py-3 border-t border-gray-100"
+                                        onClick={() => {
+                                            toggleMenu();
+                                            startLoading();
+                                        }}
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-5 w-5 mr-2.5 text-gray-500"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+                                            />
+                                        </svg>
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        href={route("logout")}
+                                        as="button"
+                                        className="flex items-center w-full text-left text-red-600 py-3 border-t border-gray-100"
+                                        onClick={() => toggleMenu()}
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-5 w-5 mr-2.5"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                            />
+                                        </svg>
+                                        Keluar
+                                    </Link>
                                 </div>
-                                <Link
-                                    href={route("profile.index")}
-                                    className="flex items-center text-gray-700 py-3 border-t border-gray-100"
-                                    onClick={() => {
-                                        toggleMenu();
-                                        startLoading();
-                                    }}
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5 mr-2.5 text-gray-500"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
+                            ) : (
+                                <div className="flex flex-col space-y-3 mt-4">
+                                    <Link
+                                        href={route("login")}
+                                        className="border border-[#089BFF] text-[#089BFF] py-3 px-4 rounded-lg text-center text-[16px]"
+                                        onClick={() => {
+                                            toggleMenu();
+                                            startLoading();
+                                        }}
                                     >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                        />
-                                    </svg>
-                                    Profil Saya
-                                </Link>
-                                <Link
-                                    href={route("dashboard")}
-                                    className="flex items-center text-gray-700 py-3 border-t border-gray-100"
-                                    onClick={() => {
-                                        toggleMenu();
-                                        startLoading();
-                                    }}
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5 mr-2.5 text-gray-500"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
+                                        Masuk
+                                    </Link>
+                                    <Link
+                                        href="/register"
+                                        className="bg-gradient-to-r from-[#089BFF] to-[#0081d6] text-white text-[16px] font-semibold py-3 px-4 rounded-lg text-center"
+                                        onClick={() => {
+                                            toggleMenu();
+                                            startLoading();
+                                        }}
                                     >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
-                                        />
-                                    </svg>
-                                    Dashboard
-                                </Link>
-                                <Link
-                                    href={route("logout")}
-                                    as="button"
-                                    className="flex items-center w-full text-left text-red-600 py-3 border-t border-gray-100"
-                                    onClick={() => toggleMenu()}
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5 mr-2.5"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                                        />
-                                    </svg>
-                                    Keluar
-                                </Link>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col space-y-3 mt-4">
-                                <Link
-                                    href={route("login")}
-                                    className="border border-[#089BFF] text-[#089BFF] py-3 px-4 rounded-lg text-center text-[16px]"
-                                    onClick={() => {
-                                        toggleMenu();
-                                        startLoading();
-                                    }}
-                                >
-                                    Masuk
-                                </Link>
-                                <Link
-                                    href="/register"
-                                    className="bg-gradient-to-r from-[#089BFF] to-[#0081d6] text-white text-[16px] font-semibold py-3 px-4 rounded-lg text-center"
-                                    onClick={() => {
-                                        toggleMenu();
-                                        startLoading();
-                                    }}
-                                >
-                                    Daftar
-                                </Link>
-                            </div>
-                        )}
+                                        Daftar
+                                    </Link>
+                                </div>
+                            )}
+                        </nav>
                     </div>
                 </Transition>
             </nav>

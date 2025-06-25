@@ -23,7 +23,9 @@ export default function GuestLayout({
     // Update document title if provided
     useEffect(() => {
         if (pageTitle) {
-            document.title = `${pageTitle} | PT. EconoMate CRM`;
+            document.title = `${pageTitle} | EconoMate`;
+        } else {
+            document.title = `Welcome | EconoMate`; // Default title jika pageTitle kosong
         }
     }, [pageTitle]);
 

@@ -38,7 +38,8 @@ const FinancialServices = () => {
                             </p>
                             <div className="mt-auto pt-2">
                                 <Link
-                                    href="/features#wealth"
+                                    href="#"
+                                    // href="/features#wealth"
                                     className="text-[#089BFF] font-medium flex items-center hover:underline"
                                 >
                                     Pelajari lebih lanjut
@@ -78,7 +79,8 @@ const FinancialServices = () => {
                             </p>
                             <div className="mt-auto pt-2">
                                 <Link
-                                    href="/features#recording"
+                                    href="#"
+                                    // href="/features#recording"
                                     className="text-[#089BFF] font-medium flex items-center hover:underline"
                                 >
                                     Pelajari lebih lanjut
@@ -118,7 +120,8 @@ const FinancialServices = () => {
                             </p>
                             <div className="mt-auto pt-2">
                                 <Link
-                                    href="/features#analysis"
+                                    href="#"
+                                    // href="/features#analysis"
                                     className="text-[#089BFF] font-medium flex items-center hover:underline"
                                 >
                                     Pelajari lebih lanjut
@@ -160,7 +163,8 @@ const FinancialServices = () => {
                             </p>
                             <div className="mt-auto pt-2">
                                 <Link
-                                    href="/features#bills"
+                                    href="#"
+                                    // href="/features#bills"
                                     className="text-[#089BFF] font-medium flex items-center hover:underline"
                                 >
                                     Pelajari lebih lanjut
@@ -200,7 +204,8 @@ const FinancialServices = () => {
                             </p>
                             <div className="mt-auto pt-2">
                                 <Link
-                                    href="/features#capital"
+                                    href="#"
+                                    // href="/features#capital"
                                     className="text-[#089BFF] font-medium flex items-center hover:underline"
                                 >
                                     Pelajari lebih lanjut

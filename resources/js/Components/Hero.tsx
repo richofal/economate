@@ -36,13 +36,24 @@ const Hero: React.FC = () => {
                                     Mulai Sekarang
                                 </Link>
 
-                                <Link
-                                    href="/features"
-                                    onClick={startLoading}
+                                <a
+                                    href="#layanan-section"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        const element =
+                                            document.getElementById(
+                                                "layanan-section"
+                                            );
+                                        if (element) {
+                                            element.scrollIntoView({
+                                                behavior: "smooth",
+                                            });
+                                        }
+                                    }}
                                     className="bg-white text-[#089BFF] border-2 border-[#089BFF] text-lg md:text-xl font-medium py-3 px-8 rounded-full hover:bg-blue-50 transform hover:scale-105 transition duration-300"
                                 >
                                     Lihat Layanan
-                                </Link>
+                                </a>
                             </div>
                         </section>
 

@@ -12,6 +12,7 @@ import {
     PiggyBank,
     Divide,
     Receipt,
+    X,
 } from "lucide-react";
 import DefaultUserImage from "@/Components/DefaultUserImage";
 import { PageProps } from "@/types";
@@ -241,6 +242,7 @@ const Sidebar = ({ isSidebarOpen }: SidebarProps) => {
         );
     };
 
+    // --------- SIDEBAR CONTENT TANPA LOGO ----------
     const SidebarContent = () => (
         <motion.div
             initial={false}
@@ -249,34 +251,10 @@ const Sidebar = ({ isSidebarOpen }: SidebarProps) => {
             className="h-screen flex flex-col bg-gradient-to-b from-[#089BFF] to-[#0470b8] shadow-lg overflow-hidden"
         >
             <div className="flex-shrink-0">
-                <div className="flex p-4 h-16 items-center justify-center">
-                    <Link href={route("dashboard")}>
-                        <AnimatePresence mode="wait">
-                            <motion.img
-                                key={isSidebarOpen ? "logo" : "icon"}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 10 }}
-                                transition={{ duration: 0.2 }}
-                                alt={
-                                    isSidebarOpen
-                                        ? "EconoMate Logo"
-                                        : "EconoMate Icon"
-                                }
-                                className="cursor-pointer"
-                                src={
-                                    isSidebarOpen
-                                        ? "/images/logo.png"
-                                        : "/images/icon.png"
-                                }
-                                style={{
-                                    height: isSidebarOpen ? "auto" : "2rem",
-                                    width: isSidebarOpen ? "10rem" : "auto",
-                                }}
-                            />
-                        </AnimatePresence>
-                    </Link>
-                </div>
+                {/* LOGO DIHAPUS */}
+                {/* <div className="flex p-4 h-16 items-center justify-center">
+                    ... logo di sini, sekarang dihapus ...
+                </div> */}
                 <div className="px-4 py-3 border-y border-white/20">
                     <div
                         className={`flex items-center ${
@@ -336,15 +314,11 @@ const Sidebar = ({ isSidebarOpen }: SidebarProps) => {
                         size={16}
                         className={isSidebarOpen ? "mr-2" : "mr-0"}
                     />
-                    <span
-                        className={`font-medium text-sm whitespace-nowrap ${
-                            isSidebarOpen
-                                ? "opacity-100"
-                                : "opacity-0 pointer-events-none"
-                        }`}
-                    >
-                        Keluar
-                    </span>
+                    {isSidebarOpen && (
+                        <span className="font-medium text-sm whitespace-nowrap">
+                            Keluar
+                        </span>
+                    )}
                 </Link>
             </div>
         </motion.div>
@@ -353,12 +327,14 @@ const Sidebar = ({ isSidebarOpen }: SidebarProps) => {
     return (
         <>
             <div className="lg:hidden">
-                <button
-                    onClick={() => setIsMobileSidebarOpen(true)}
-                    className="fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md shadow-lg"
-                >
-                    <Menu size={24} />
-                </button>
+                {!isMobileSidebarOpen && (
+                    <button
+                        onClick={() => setIsMobileSidebarOpen(true)}
+                        className="fixed top-4 left-4 z-50 p-2 bg-blue-600 text-white rounded-md shadow-lg"
+                    >
+                        <Menu size={24} />
+                    </button>
+                )}
                 <AnimatePresence>
                     {isMobileSidebarOpen && (
                         <>
